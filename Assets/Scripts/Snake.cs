@@ -8,7 +8,7 @@ public class Snake : MonoBehaviour
     [Header("Snake Settings")]
     public float segmentSize = 1f;
     public float headRadius = 0.3f;
-    public float tailRadius = 0.1f; // Минимальный радиус для последнего сегмента
+    public float tailRadius = 0.1f;
     [Range(0, 1)] public float cornerSmoothing = 0.5f;
 
     [Header("Movement")]
@@ -31,7 +31,8 @@ public class Snake : MonoBehaviour
     private Vector3 targetPosition;
     private const int radialSegments = 12;
     private Vector3 lastGoodDirection = Vector3.forward;
-    private float[] segmentRadii; // Массив радиусов для каждого сегмента
+    private float[] segmentRadii;
+    private List<Vector3> segmentVelocities; // Для сглаживания движения сегментов
 
     private void Start()
     {
@@ -51,6 +52,13 @@ public class Snake : MonoBehaviour
             .OrderBy(t => t.name)
             .ToList();
 
+        // Initialize velocities for smooth movement
+        segmentVelocities = new List<Vector3>();
+        for (int i = 0; i < bodySegments.Count; i++)
+        {
+            segmentVelocities.Add(Vector3.zero);
+        }
+
         // Calculate radii for each segment
         CalculateSegmentRadii();
 
@@ -60,8 +68,8 @@ public class Snake : MonoBehaviour
 
     private void CalculateSegmentRadii()
     {
-        segmentRadii = new float[bodySegments.Count + 1]; // +1 для головы
-        segmentRadii[0] = headRadius; // Радиус головы
+        segmentRadii = new float[bodySegments.Count + 1];
+        segmentRadii[0] = headRadius; // Head radius
 
         if (bodySegments.Count > 0)
         {
@@ -137,11 +145,17 @@ public class Snake : MonoBehaviour
 
     private void MoveSnake()
     {
+        // Always update head rotation for smooth turning
+        head.rotation = Quaternion.Lerp(
+            head.rotation,
+            Quaternion.LookRotation(moveDirection),
+            rotationLerpSpeed * Time.deltaTime
+        );
+
         if (!isMoving) return;
 
         // Move head
         head.position = Vector3.MoveTowards(head.position, targetPosition, moveSpeed * Time.deltaTime);
-        head.rotation = Quaternion.Lerp(head.rotation, Quaternion.LookRotation(moveDirection), rotationLerpSpeed * Time.deltaTime);
 
         if (Vector3.Distance(head.position, targetPosition) < 0.01f)
         {
@@ -151,30 +165,47 @@ public class Snake : MonoBehaviour
 
     private void UpdatePath()
     {
-        // Only add new point when head has moved at least 50% of segment size
+        // Only add new point when head has moved enough
         if (pathPoints.Count == 0 || Vector3.Distance(head.position, pathPoints[0]) > segmentSize * 0.9f)
         {
             pathPoints.Insert(0, head.position);
         }
 
-        // Maintain path length (1 point per segment + head)
+        // Maintain path length
         int maxPathPoints = bodySegments.Count + 1;
         while (pathPoints.Count > maxPathPoints)
         {
             pathPoints.RemoveAt(pathPoints.Count - 1);
         }
 
-        // Update body segments positions with direct position assignment
+        // Update body segments with smooth movement
         for (int i = 0; i < bodySegments.Count; i++)
         {
             int targetIndex = Mathf.Min(i + 1, pathPoints.Count - 1);
-            bodySegments[i].position = pathPoints[targetIndex];
+            Vector3 targetPos = pathPoints[targetIndex];
 
-            // Calculate direction
+            // Исправление: используем локальную переменную для скорости
+            Vector3 currentVelocity = segmentVelocities[i];
+            bodySegments[i].position = Vector3.SmoothDamp(
+                bodySegments[i].position,
+                targetPos,
+                ref currentVelocity,
+                1f / followSmoothness
+            );
+            segmentVelocities[i] = currentVelocity; // Возвращаем значение обратно в список
+
+            // Calculate direction with smoothing
             Vector3 dir;
-            if (targetIndex > 0 && targetIndex < pathPoints.Count - 1)
+            if (targetIndex > 0)
             {
                 dir = (pathPoints[targetIndex - 1] - pathPoints[targetIndex]).normalized;
+
+                // Apply corner smoothing for non-tail segments
+                if (targetIndex < pathPoints.Count - 1)
+                {
+                    Vector3 nextDir = (pathPoints[targetIndex] - pathPoints[targetIndex + 1]).normalized;
+                    dir = Vector3.Lerp(dir, nextDir, cornerSmoothing).normalized;
+                }
             }
             else
             {
@@ -190,16 +221,24 @@ public class Snake : MonoBehaviour
 
     private void UpdateMesh()
     {
-        if (pathPoints.Count < 2) return;
+        // Use actual positions for smooth mesh
+        List<Vector3> meshPoints = new List<Vector3>();
+        meshPoints.Add(head.position);
+        for (int i = 0; i < bodySegments.Count; i++)
+        {
+            meshPoints.Add(bodySegments[i].position);
+        }
+
+        if (meshPoints.Count < 2) return;
 
         vertices.Clear();
         triangles.Clear();
 
         // Create vertex rings along the path
-        for (int i = 0; i < pathPoints.Count; i++)
+        for (int i = 0; i < meshPoints.Count; i++)
         {
             Quaternion rotation;
-            Vector3 position = pathPoints[i];
+            Vector3 position = meshPoints[i];
             float currentRadius = segmentRadii[Mathf.Min(i, segmentRadii.Length - 1)];
 
             if (i == 0) // Head
@@ -208,12 +247,14 @@ public class Snake : MonoBehaviour
             }
             else
             {
-                Vector3 dir = (pathPoints[i - 1] - pathPoints[i]).normalized;
-                if (i < pathPoints.Count - 1)
+                Vector3 dir = (meshPoints[i - 1] - meshPoints[i]).normalized;
+
+                if (i < meshPoints.Count - 1)
                 {
-                    Vector3 nextDir = (pathPoints[i] - pathPoints[i + 1]).normalized;
+                    Vector3 nextDir = (meshPoints[i] - meshPoints[i + 1]).normalized;
                     dir = Vector3.Lerp(dir, nextDir, cornerSmoothing).normalized;
                 }
+
                 rotation = Quaternion.LookRotation(dir != Vector3.zero ? dir : lastGoodDirection);
             }
 
@@ -226,7 +267,7 @@ public class Snake : MonoBehaviour
         }
 
         // Create triangles
-        for (int i = 0; i < pathPoints.Count - 1; i++)
+        for (int i = 0; i < meshPoints.Count - 1; i++)
         {
             for (int j = 0; j < radialSegments; j++)
             {
@@ -246,9 +287,9 @@ public class Snake : MonoBehaviour
 
         // Create tail cap
         int centerIndex = vertices.Count;
-        vertices.Add(pathPoints[pathPoints.Count - 1] - transform.position);
+        vertices.Add(meshPoints[meshPoints.Count - 1] - transform.position);
 
-        int lastRingStart = (pathPoints.Count - 1) * radialSegments;
+        int lastRingStart = (meshPoints.Count - 1) * radialSegments;
         for (int j = 0; j < radialSegments; j++)
         {
             int nextJ = (j + 1) % radialSegments;
