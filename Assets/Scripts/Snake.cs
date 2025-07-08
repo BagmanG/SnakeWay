@@ -17,7 +17,6 @@ public class Snake : MonoBehaviour
     public float followSmoothness = 10f;
 
     [Header("References")]
-    public GameObject headPrefab;
     public Material snakeMaterial;
 
     private List<Transform> bodySegments = new List<Transform>();
@@ -36,22 +35,29 @@ public class Snake : MonoBehaviour
 
     private void Start()
     {
-        if (headPrefab == null)
+        // Find head (first child object)
+        if (transform.childCount == 0)
         {
-            Debug.LogError("Head prefab is not assigned!");
+            Debug.LogError("No child objects found for snake!");
             return;
         }
 
-        // Create head at parent's position (0,0,0)
-        head = Instantiate(headPrefab, transform).transform;
-        head.localPosition = Vector3.zero; // Устанавливаем локальную позицию относительно родителя
+        head = transform.GetChild(0);
         head.name = "Head";
 
-        // Get and sort body segments
-        bodySegments = GetComponentsInChildren<Transform>()
-            .Where(t => t != transform && t != head && t.name.Contains("Segment"))
-            .OrderBy(t => t.name)
-            .ToList();
+        // Find all segments (children with "Segment" in name)
+        bodySegments = new List<Transform>();
+        for (int i = 1; i < transform.childCount; i++)
+        {
+            Transform child = transform.GetChild(i);
+            if (child.name.Contains("Segment"))
+            {
+                bodySegments.Add(child);
+            }
+        }
+
+        // Order segments by name
+        bodySegments = bodySegments.OrderBy(t => t.name).ToList();
 
         // Initialize velocities for smooth movement
         segmentVelocities = new List<Vector3>();
@@ -88,12 +94,10 @@ public class Snake : MonoBehaviour
         pathPoints.Clear();
         pathPoints.Add(head.localPosition); // Head position (0,0,0)
 
-        // Position body segments with proper spacing relative to parent
+        // Position body segments with proper spacing based on their actual positions
         for (int i = 0; i < bodySegments.Count; i++)
         {
-            Vector3 segmentPosition = -moveDirection * segmentSize * (i + 1);
-            bodySegments[i].localPosition = segmentPosition;
-            pathPoints.Add(segmentPosition);
+            pathPoints.Add(bodySegments[i].localPosition);
         }
     }
 
@@ -146,12 +150,15 @@ public class Snake : MonoBehaviour
 
     private void MoveSnake()
     {
-        // Always update head rotation for smooth turning
-        head.rotation = Quaternion.Lerp(
-            head.rotation,
-            Quaternion.LookRotation(moveDirection),
-            rotationLerpSpeed * Time.deltaTime
-        );
+        // Update head rotation based on movement direction
+        if (moveDirection != Vector3.zero)
+        {
+            head.rotation = Quaternion.Lerp(
+                head.rotation,
+                Quaternion.LookRotation(moveDirection),
+                rotationLerpSpeed * Time.deltaTime
+            );
+        }
 
         if (!isMoving) return;
 
