@@ -7,7 +7,8 @@ public class Snake : MonoBehaviour
 {
     [Header("Snake Settings")]
     public float segmentSize = 1f;
-    public float bodyRadius = 0.3f;
+    public float headRadius = 0.3f;
+    public float tailRadius = 0.1f; // Минимальный радиус для последнего сегмента
     [Range(0, 1)] public float cornerSmoothing = 0.5f;
 
     [Header("Movement")]
@@ -25,12 +26,12 @@ public class Snake : MonoBehaviour
     private Mesh mesh;
     private List<Vector3> vertices = new List<Vector3>();
     private List<int> triangles = new List<int>();
-    private List<Vector2> uvs = new List<Vector2>();
     private bool isMoving = false;
     private Vector3 moveDirection = Vector3.forward;
     private Vector3 targetPosition;
     private const int radialSegments = 12;
     private Vector3 lastGoodDirection = Vector3.forward;
+    private float[] segmentRadii; // Массив радиусов для каждого сегмента
 
     private void Start()
     {
@@ -50,8 +51,27 @@ public class Snake : MonoBehaviour
             .OrderBy(t => t.name)
             .ToList();
 
+        // Calculate radii for each segment
+        CalculateSegmentRadii();
+
         InitializePath();
         GenerateMesh();
+    }
+
+    private void CalculateSegmentRadii()
+    {
+        segmentRadii = new float[bodySegments.Count + 1]; // +1 для головы
+        segmentRadii[0] = headRadius; // Радиус головы
+
+        if (bodySegments.Count > 0)
+        {
+            float radiusStep = (headRadius - tailRadius) / bodySegments.Count;
+
+            for (int i = 1; i < segmentRadii.Length; i++)
+            {
+                segmentRadii[i] = headRadius - radiusStep * i;
+            }
+        }
     }
 
     private void InitializePath()
@@ -174,13 +194,13 @@ public class Snake : MonoBehaviour
 
         vertices.Clear();
         triangles.Clear();
-        uvs.Clear();
 
         // Create vertex rings along the path
         for (int i = 0; i < pathPoints.Count; i++)
         {
             Quaternion rotation;
             Vector3 position = pathPoints[i];
+            float currentRadius = segmentRadii[Mathf.Min(i, segmentRadii.Length - 1)];
 
             if (i == 0) // Head
             {
@@ -200,9 +220,8 @@ public class Snake : MonoBehaviour
             for (int j = 0; j < radialSegments; j++)
             {
                 float angle = j * Mathf.PI * 2f / radialSegments;
-                Vector3 localPos = new Vector3(Mathf.Cos(angle) * bodyRadius, Mathf.Sin(angle) * bodyRadius, 0);
+                Vector3 localPos = new Vector3(Mathf.Cos(angle) * currentRadius, Mathf.Sin(angle) * currentRadius, 0);
                 vertices.Add(position + rotation * localPos - transform.position);
-                uvs.Add(new Vector2(j / (float)(radialSegments - 1), i / (float)(pathPoints.Count - 1)));
             }
         }
 
@@ -228,7 +247,6 @@ public class Snake : MonoBehaviour
         // Create tail cap
         int centerIndex = vertices.Count;
         vertices.Add(pathPoints[pathPoints.Count - 1] - transform.position);
-        uvs.Add(new Vector2(0.5f, 0.5f));
 
         int lastRingStart = (pathPoints.Count - 1) * radialSegments;
         for (int j = 0; j < radialSegments; j++)
@@ -243,7 +261,6 @@ public class Snake : MonoBehaviour
         mesh.Clear();
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
-        mesh.uv = uvs.ToArray();
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
     }
