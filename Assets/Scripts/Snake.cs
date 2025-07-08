@@ -32,7 +32,7 @@ public class Snake : MonoBehaviour
     private const int radialSegments = 12;
     private Vector3 lastGoodDirection = Vector3.forward;
     private float[] segmentRadii;
-    private List<Vector3> segmentVelocities; // Для сглаживания движения сегментов
+    private List<Vector3> segmentVelocities;
 
     private void Start()
     {
@@ -42,8 +42,9 @@ public class Snake : MonoBehaviour
             return;
         }
 
-        // Create head
+        // Create head at parent's position (0,0,0)
         head = Instantiate(headPrefab, transform).transform;
+        head.localPosition = Vector3.zero; // Устанавливаем локальную позицию относительно родителя
         head.name = "Head";
 
         // Get and sort body segments
@@ -85,13 +86,13 @@ public class Snake : MonoBehaviour
     private void InitializePath()
     {
         pathPoints.Clear();
-        pathPoints.Add(head.position); // Head position
+        pathPoints.Add(head.localPosition); // Head position (0,0,0)
 
-        // Position body segments with proper spacing
+        // Position body segments with proper spacing relative to parent
         for (int i = 0; i < bodySegments.Count; i++)
         {
-            Vector3 segmentPosition = head.position - moveDirection * segmentSize * (i + 1);
-            bodySegments[i].position = segmentPosition;
+            Vector3 segmentPosition = -moveDirection * segmentSize * (i + 1);
+            bodySegments[i].localPosition = segmentPosition;
             pathPoints.Add(segmentPosition);
         }
     }
@@ -139,7 +140,7 @@ public class Snake : MonoBehaviour
     {
         lastGoodDirection = moveDirection;
         moveDirection = newDirection;
-        targetPosition = head.position + moveDirection * segmentSize;
+        targetPosition = head.localPosition + moveDirection * segmentSize;
         isMoving = true;
     }
 
@@ -155,9 +156,9 @@ public class Snake : MonoBehaviour
         if (!isMoving) return;
 
         // Move head
-        head.position = Vector3.MoveTowards(head.position, targetPosition, moveSpeed * Time.deltaTime);
+        head.localPosition = Vector3.MoveTowards(head.localPosition, targetPosition, moveSpeed * Time.deltaTime);
 
-        if (Vector3.Distance(head.position, targetPosition) < 0.01f)
+        if (Vector3.Distance(head.localPosition, targetPosition) < 0.01f)
         {
             isMoving = false;
         }
@@ -166,9 +167,9 @@ public class Snake : MonoBehaviour
     private void UpdatePath()
     {
         // Only add new point when head has moved enough
-        if (pathPoints.Count == 0 || Vector3.Distance(head.position, pathPoints[0]) > segmentSize * 0.9f)
+        if (pathPoints.Count == 0 || Vector3.Distance(head.localPosition, pathPoints[0]) > segmentSize * 0.9f)
         {
-            pathPoints.Insert(0, head.position);
+            pathPoints.Insert(0, head.localPosition);
         }
 
         // Maintain path length
@@ -184,15 +185,14 @@ public class Snake : MonoBehaviour
             int targetIndex = Mathf.Min(i + 1, pathPoints.Count - 1);
             Vector3 targetPos = pathPoints[targetIndex];
 
-            // Исправление: используем локальную переменную для скорости
             Vector3 currentVelocity = segmentVelocities[i];
-            bodySegments[i].position = Vector3.SmoothDamp(
-                bodySegments[i].position,
+            bodySegments[i].localPosition = Vector3.SmoothDamp(
+                bodySegments[i].localPosition,
                 targetPos,
                 ref currentVelocity,
                 1f / followSmoothness
             );
-            segmentVelocities[i] = currentVelocity; // Возвращаем значение обратно в список
+            segmentVelocities[i] = currentVelocity;
 
             // Calculate direction with smoothing
             Vector3 dir;
@@ -209,7 +209,7 @@ public class Snake : MonoBehaviour
             }
             else
             {
-                dir = (head.position - bodySegments[i].position).normalized;
+                dir = (head.localPosition - bodySegments[i].localPosition).normalized;
             }
 
             if (dir != Vector3.zero)
@@ -223,10 +223,10 @@ public class Snake : MonoBehaviour
     {
         // Use actual positions for smooth mesh
         List<Vector3> meshPoints = new List<Vector3>();
-        meshPoints.Add(head.position);
+        meshPoints.Add(head.localPosition);
         for (int i = 0; i < bodySegments.Count; i++)
         {
-            meshPoints.Add(bodySegments[i].position);
+            meshPoints.Add(bodySegments[i].localPosition);
         }
 
         if (meshPoints.Count < 2) return;
@@ -262,7 +262,7 @@ public class Snake : MonoBehaviour
             {
                 float angle = j * Mathf.PI * 2f / radialSegments;
                 Vector3 localPos = new Vector3(Mathf.Cos(angle) * currentRadius, Mathf.Sin(angle) * currentRadius, 0);
-                vertices.Add(position + rotation * localPos - transform.position);
+                vertices.Add(position + rotation * localPos);
             }
         }
 
@@ -287,7 +287,7 @@ public class Snake : MonoBehaviour
 
         // Create tail cap
         int centerIndex = vertices.Count;
-        vertices.Add(meshPoints[meshPoints.Count - 1] - transform.position);
+        vertices.Add(meshPoints[meshPoints.Count - 1]);
 
         int lastRingStart = (meshPoints.Count - 1) * radialSegments;
         for (int j = 0; j < radialSegments; j++)
