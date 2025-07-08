@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-public class SmoothSnake : MonoBehaviour
+public class Snake : MonoBehaviour
 {
     [Header("Snake Settings")]
     public int initialLength = 5;
@@ -13,24 +13,21 @@ public class SmoothSnake : MonoBehaviour
 
     [Header("Movement")]
     public float moveSpeed = 5f;
-    public float rotationSpeed = 10f;
-    public float turnSmoothness = 2f;
+    public float rotationSpeed = 30f;
 
     [Header("References")]
     public GameObject headPrefab;
     public Material snakeMaterial;
 
     private List<Transform> segments = new List<Transform>();
-    private List<Vector3> segmentPositions = new List<Vector3>();
-    private List<Quaternion> segmentRotations = new List<Quaternion>();
+    private List<Vector3> positions = new List<Vector3>();
     private Mesh mesh;
     private List<Vector3> vertices = new List<Vector3>();
     private List<int> triangles = new List<int>();
     private bool isMoving = false;
     private Vector3 moveDirection = Vector3.forward;
     private Vector3 targetPosition;
-    private Vector3 lastMoveDirection;
-    private float bodyRadius = 0.15f;
+    private List<Vector3> pathPoints = new List<Vector3>();
 
     private void Start()
     {
@@ -42,6 +39,7 @@ public class SmoothSnake : MonoBehaviour
     {
         HandleInput();
         MoveSnake();
+        UpdateBodyPositions();
         UpdateMesh();
     }
 
@@ -51,18 +49,22 @@ public class SmoothSnake : MonoBehaviour
         GameObject head = Instantiate(headPrefab, transform);
         head.name = "Head";
         segments.Add(head.transform);
-        segmentPositions.Add(transform.position);
-        segmentRotations.Add(transform.rotation);
+        positions.Add(transform.position);
+
+        // Create initial path points
+        for (int i = 0; i < initialLength; i++)
+        {
+            pathPoints.Add(transform.position - Vector3.forward * i * segmentSize);
+        }
 
         // Create body segments
         for (int i = 1; i < initialLength; i++)
         {
             GameObject segment = new GameObject($"Segment_{i}");
             segment.transform.SetParent(transform);
-            segment.transform.localPosition = new Vector3(0, 0, -i * segmentSize);
+            segment.transform.position = transform.position - Vector3.forward * i * segmentSize;
             segments.Add(segment.transform);
-            segmentPositions.Add(segment.transform.position);
-            segmentRotations.Add(segment.transform.rotation);
+            positions.Add(segment.transform.position);
         }
     }
 
@@ -72,50 +74,70 @@ public class SmoothSnake : MonoBehaviour
         GetComponent<MeshFilter>().mesh = mesh;
         GetComponent<MeshRenderer>().material = snakeMaterial;
 
-        // Create circular cross-sections for smooth bends
-        int radialSegments = 12; // More segments = smoother bends
-        float lengthPerSegment = segmentSize;
-
+        // Create vertices for straight segments only
         for (int i = 0; i < initialLength; i++)
         {
-            float t = i / (float)(initialLength - 1);
-            float radius = Mathf.Lerp(bodyWidth * 0.5f, bodyWidth * 0.3f, t);
-
-            for (int j = 0; j < radialSegments; j++)
-            {
-                float angle = j * Mathf.PI * 2f / radialSegments;
-                Vector3 pos = new Vector3(
-                    Mathf.Cos(angle) * radius,
-                    Mathf.Sin(angle) * bodyHeight,
-                    -i * lengthPerSegment
-                );
-                vertices.Add(pos);
-            }
-        }
-
-        // Create triangles between segments
-        for (int i = 0; i < initialLength - 1; i++)
-        {
-            for (int j = 0; j < radialSegments; j++)
-            {
-                int current = i * radialSegments + j;
-                int next = i * radialSegments + (j + 1) % radialSegments;
-                int below = (i + 1) * radialSegments + j;
-                int belowNext = (i + 1) * radialSegments + (j + 1) % radialSegments;
-
-                triangles.Add(current);
-                triangles.Add(next);
-                triangles.Add(belowNext);
-
-                triangles.Add(current);
-                triangles.Add(belowNext);
-                triangles.Add(below);
-            }
+            AddStraightSegmentVertices(i);
         }
 
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
         mesh.RecalculateNormals();
+    }
+
+    private void AddStraightSegmentVertices(int segmentIndex)
+    {
+        float width = bodyWidth;
+        float height = bodyHeight;
+
+        // Front face vertices
+        vertices.Add(new Vector3(-width / 2, -height / 2, -segmentIndex * segmentSize));
+        vertices.Add(new Vector3(width / 2, -height / 2, -segmentIndex * segmentSize));
+        vertices.Add(new Vector3(width / 2, height / 2, -segmentIndex * segmentSize));
+        vertices.Add(new Vector3(-width / 2, height / 2, -segmentIndex * segmentSize));
+
+        // Create triangles for straight segments only
+        if (segmentIndex > 0)
+        {
+            int baseIndex = segmentIndex * 4;
+
+            // Front face
+            triangles.Add(baseIndex);
+            triangles.Add(baseIndex + 1);
+            triangles.Add(baseIndex + 2);
+            triangles.Add(baseIndex);
+            triangles.Add(baseIndex + 2);
+            triangles.Add(baseIndex + 3);
+
+            // Connect to previous segment (straight connection)
+            triangles.Add(baseIndex - 4);
+            triangles.Add(baseIndex - 3);
+            triangles.Add(baseIndex);
+            triangles.Add(baseIndex - 3);
+            triangles.Add(baseIndex + 1);
+            triangles.Add(baseIndex);
+
+            triangles.Add(baseIndex - 3);
+            triangles.Add(baseIndex - 2);
+            triangles.Add(baseIndex + 1);
+            triangles.Add(baseIndex - 2);
+            triangles.Add(baseIndex + 2);
+            triangles.Add(baseIndex + 1);
+
+            triangles.Add(baseIndex - 2);
+            triangles.Add(baseIndex - 1);
+            triangles.Add(baseIndex + 2);
+            triangles.Add(baseIndex - 1);
+            triangles.Add(baseIndex + 3);
+            triangles.Add(baseIndex + 2);
+
+            triangles.Add(baseIndex - 1);
+            triangles.Add(baseIndex - 4);
+            triangles.Add(baseIndex + 3);
+            triangles.Add(baseIndex - 4);
+            triangles.Add(baseIndex);
+            triangles.Add(baseIndex + 3);
+        }
     }
 
     private void HandleInput()
@@ -124,31 +146,34 @@ public class SmoothSnake : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.W))
         {
-            moveDirection = Vector3.forward;
-            StartMovement();
+            if (moveDirection != Vector3.back)
+                ChangeDirection(Vector3.forward);
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
-            moveDirection = Vector3.back;
-            StartMovement();
+            if (moveDirection != Vector3.forward)
+                ChangeDirection(Vector3.back);
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
-            moveDirection = Vector3.left;
-            StartMovement();
+            if (moveDirection != Vector3.right)
+                ChangeDirection(Vector3.left);
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
-            moveDirection = Vector3.right;
-            StartMovement();
+            if (moveDirection != Vector3.left)
+                ChangeDirection(Vector3.right);
         }
     }
 
-    private void StartMovement()
+    private void ChangeDirection(Vector3 newDirection)
     {
+        moveDirection = newDirection;
         targetPosition = segments[0].position + moveDirection * segmentSize;
         isMoving = true;
-        lastMoveDirection = moveDirection;
+
+        // Add turn point
+        pathPoints.Insert(0, segments[0].position);
     }
 
     private void MoveSnake()
@@ -162,111 +187,124 @@ public class SmoothSnake : MonoBehaviour
             moveSpeed * Time.deltaTime
         );
 
-        // Smooth rotation for head
-        if (moveDirection != Vector3.zero)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            segments[0].rotation = Quaternion.Slerp(
-                segments[0].rotation,
-                targetRotation,
-                rotationSpeed * Time.deltaTime
-            );
-        }
+        // Instant 90° rotation
+        segments[0].rotation = Quaternion.LookRotation(moveDirection);
 
-        // Check if head reached target
         if (Vector3.Distance(segments[0].position, targetPosition) < 0.01f)
         {
             isMoving = false;
-            UpdateBodyPositions();
-        }
-
-        // Update body segments with smooth following
-        for (int i = 1; i < segments.Count; i++)
-        {
-            Vector3 targetPos = segmentPositions[i - 1];
-            Vector3 direction = (targetPos - segments[i].position).normalized;
-
-            // Smooth movement
-            segments[i].position = Vector3.Lerp(
-                segments[i].position,
-                targetPos - direction * segmentSize * 0.9f,
-                turnSmoothness * Time.deltaTime
-            );
-
-            // Smooth rotation
-            if (direction != Vector3.zero)
-            {
-                Quaternion targetRot = Quaternion.LookRotation(direction);
-                segments[i].rotation = Quaternion.Slerp(
-                    segments[i].rotation,
-                    targetRot,
-                    rotationSpeed * Time.deltaTime
-                );
-            }
+            positions[0] = segments[0].position;
         }
     }
 
     private void UpdateBodyPositions()
     {
-        // Shift positions
-        for (int i = segmentPositions.Count - 1; i > 0; i--)
+        // Update body segments with exact spacing
+        for (int i = 1; i < segments.Count; i++)
         {
-            segmentPositions[i] = segmentPositions[i - 1];
-        }
-        segmentPositions[0] = segments[0].position;
+            // Find target position in path
+            int targetIndex = Mathf.Min(i, pathPoints.Count - 1);
+            if (targetIndex >= 0 && targetIndex < pathPoints.Count)
+            {
+                segments[i].position = pathPoints[targetIndex];
 
-        // Shift rotations
-        for (int i = segmentRotations.Count - 1; i > 0; i--)
-        {
-            segmentRotations[i] = segmentRotations[i - 1];
+                // Only rotate if direction changed
+                if (targetIndex > 0 && targetIndex < pathPoints.Count - 1)
+                {
+                    Vector3 dir = (pathPoints[targetIndex - 1] - pathPoints[targetIndex]).normalized;
+                    if (dir != Vector3.zero)
+                        segments[i].rotation = Quaternion.LookRotation(dir);
+                }
+            }
         }
-        segmentRotations[0] = segments[0].rotation;
     }
 
     private void UpdateMesh()
     {
-        // Update vertices based on current segment positions and rotations
-        int radialSegments = 12;
-        float lengthPerSegment = segmentSize;
+        vertices.Clear();
+        triangles.Clear();
 
+        // Create vertices for each segment
         for (int i = 0; i < segments.Count; i++)
         {
-            float t = i / (float)(segments.Count - 1);
-            float radius = Mathf.Lerp(bodyWidth * 0.5f, bodyWidth * 0.3f, t);
+            float width = bodyWidth;
+            float height = bodyHeight;
 
-            for (int j = 0; j < radialSegments; j++)
+            // Get segment transform
+            Vector3 pos = segments[i].position - transform.position;
+            Quaternion rot = segments[i].rotation;
+
+            // Add vertices for this segment
+            vertices.Add(pos + rot * new Vector3(-width / 2, -height / 2, 0));
+            vertices.Add(pos + rot * new Vector3(width / 2, -height / 2, 0));
+            vertices.Add(pos + rot * new Vector3(width / 2, height / 2, 0));
+            vertices.Add(pos + rot * new Vector3(-width / 2, height / 2, 0));
+
+            // Create triangles if not first segment
+            if (i > 0)
             {
-                float angle = j * Mathf.PI * 2f / radialSegments;
-                Vector3 localPos = new Vector3(
-                    Mathf.Cos(angle) * radius,
-                    Mathf.Sin(angle) * bodyHeight,
-                    0
-                );
+                int baseIndex = i * 4;
 
-                // Transform vertex position according to segment transform
-                int vertexIndex = i * radialSegments + j;
-                vertices[vertexIndex] = segments[i].TransformPoint(localPos) - transform.position;
+                // Front face
+                triangles.Add(baseIndex);
+                triangles.Add(baseIndex + 1);
+                triangles.Add(baseIndex + 2);
+                triangles.Add(baseIndex);
+                triangles.Add(baseIndex + 2);
+                triangles.Add(baseIndex + 3);
+
+                // Connect to previous segment
+                triangles.Add(baseIndex - 4);
+                triangles.Add(baseIndex - 3);
+                triangles.Add(baseIndex);
+                triangles.Add(baseIndex - 3);
+                triangles.Add(baseIndex + 1);
+                triangles.Add(baseIndex);
+
+                triangles.Add(baseIndex - 3);
+                triangles.Add(baseIndex - 2);
+                triangles.Add(baseIndex + 1);
+                triangles.Add(baseIndex - 2);
+                triangles.Add(baseIndex + 2);
+                triangles.Add(baseIndex + 1);
+
+                triangles.Add(baseIndex - 2);
+                triangles.Add(baseIndex - 1);
+                triangles.Add(baseIndex + 2);
+                triangles.Add(baseIndex - 1);
+                triangles.Add(baseIndex + 3);
+                triangles.Add(baseIndex + 2);
+
+                triangles.Add(baseIndex - 1);
+                triangles.Add(baseIndex - 4);
+                triangles.Add(baseIndex + 3);
+                triangles.Add(baseIndex - 4);
+                triangles.Add(baseIndex);
+                triangles.Add(baseIndex + 3);
             }
         }
 
         mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
         mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
     }
 
     private void OnDrawGizmos()
     {
         if (segments == null || segments.Count == 0) return;
 
-        // Draw segment positions
-        Gizmos.color = Color.red;
-        for (int i = 0; i < segments.Count; i++)
+        // Draw path points
+        Gizmos.color = Color.blue;
+        foreach (var point in pathPoints)
         {
-            Gizmos.DrawSphere(segments[i].position, 0.1f);
-            if (i > 0)
-            {
-                Gizmos.DrawLine(segments[i - 1].position, segments[i].position);
-            }
+            Gizmos.DrawSphere(point, 0.1f);
+        }
+
+        // Draw segment connections
+        Gizmos.color = Color.red;
+        for (int i = 1; i < segments.Count; i++)
+        {
+            Gizmos.DrawLine(segments[i - 1].position, segments[i].position);
         }
     }
 }
