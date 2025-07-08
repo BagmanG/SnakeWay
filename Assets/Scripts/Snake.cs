@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class Snake : MonoBehaviour
@@ -12,9 +13,10 @@ public class Snake : MonoBehaviour
     [Header("Movement")]
     public float moveSpeed = 5f;
     public float rotationLerpSpeed = 10f;
+    public float followSmoothness = 10f;
 
     [Header("References")]
-    public GameObject headPrefab; // Префаб головы
+    public GameObject headPrefab;
     public Material snakeMaterial;
 
     private List<Transform> bodySegments = new List<Transform>();
@@ -32,26 +34,21 @@ public class Snake : MonoBehaviour
 
     private void Start()
     {
-        // Создаем голову из префаба
-        if (headPrefab != null)
-        {
-            head = Instantiate(headPrefab, transform).transform;
-            head.name = "Head";
-        }
-        else
+        if (headPrefab == null)
         {
             Debug.LogError("Head prefab is not assigned!");
             return;
         }
 
-        // Собираем все дочерние объекты как сегменты тела (исключая голову)
-        foreach (Transform child in transform)
-        {
-            if (child != head)
-            {
-                bodySegments.Add(child);
-            }
-        }
+        // Create head
+        head = Instantiate(headPrefab, transform).transform;
+        head.name = "Head";
+
+        // Get and sort body segments
+        bodySegments = GetComponentsInChildren<Transform>()
+            .Where(t => t != transform && t != head && t.name.Contains("Segment"))
+            .OrderBy(t => t.name)
+            .ToList();
 
         InitializePath();
         GenerateMesh();
@@ -59,18 +56,17 @@ public class Snake : MonoBehaviour
 
     private void InitializePath()
     {
-        // Инициализируем путь на основе позиции головы и сегментов тела
         pathPoints.Clear();
 
-        // Добавляем точку для головы
+        // Initialize path with head position
         pathPoints.Add(head.position);
 
-        // Добавляем точки для сегментов тела
+        // Add body segments positions with intermediate points
         for (int i = 0; i < bodySegments.Count; i++)
         {
             pathPoints.Add(bodySegments[i].position);
 
-            // Добавляем промежуточную точку для плавности
+            // Add extra point between segments for smoothness
             if (i < bodySegments.Count - 1)
             {
                 pathPoints.Add(Vector3.Lerp(bodySegments[i].position, bodySegments[i + 1].position, 0.5f));
@@ -99,21 +95,21 @@ public class Snake : MonoBehaviour
     {
         if (isMoving) return;
 
-        if (Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKeyDown(KeyCode.W) && moveDirection != Vector3.back)
         {
-            if (moveDirection != Vector3.back) ChangeDirection(Vector3.forward);
+            ChangeDirection(Vector3.forward);
         }
-        else if (Input.GetKeyDown(KeyCode.S))
+        else if (Input.GetKeyDown(KeyCode.S) && moveDirection != Vector3.forward)
         {
-            if (moveDirection != Vector3.forward) ChangeDirection(Vector3.back);
+            ChangeDirection(Vector3.back);
         }
-        else if (Input.GetKeyDown(KeyCode.A))
+        else if (Input.GetKeyDown(KeyCode.A) && moveDirection != Vector3.right)
         {
-            if (moveDirection != Vector3.right) ChangeDirection(Vector3.left);
+            ChangeDirection(Vector3.left);
         }
-        else if (Input.GetKeyDown(KeyCode.D))
+        else if (Input.GetKeyDown(KeyCode.D) && moveDirection != Vector3.left)
         {
-            if (moveDirection != Vector3.left) ChangeDirection(Vector3.right);
+            ChangeDirection(Vector3.right);
         }
     }
 
@@ -129,19 +125,9 @@ public class Snake : MonoBehaviour
     {
         if (!isMoving) return;
 
-        // Плавное перемещение головы
-        head.position = Vector3.MoveTowards(
-            head.position,
-            targetPosition,
-            moveSpeed * Time.deltaTime
-        );
-
-        // Плавный поворот головы
-        head.rotation = Quaternion.Lerp(
-            head.rotation,
-            Quaternion.LookRotation(moveDirection),
-            rotationLerpSpeed * Time.deltaTime
-        );
+        // Move head
+        head.position = Vector3.MoveTowards(head.position, targetPosition, moveSpeed * Time.deltaTime);
+        head.rotation = Quaternion.Lerp(head.rotation, Quaternion.LookRotation(moveDirection), rotationLerpSpeed * Time.deltaTime);
 
         if (Vector3.Distance(head.position, targetPosition) < 0.01f)
         {
@@ -151,81 +137,78 @@ public class Snake : MonoBehaviour
 
     private void UpdatePath()
     {
-        // Добавляем новую точку пути с интервалом
-        if (pathPoints.Count == 0 ||
-            Vector3.Distance(head.position, pathPoints[0]) > segmentSize * 0.25f)
+        // Add new path point when head moves far enough
+        if (pathPoints.Count == 0 || Vector3.Distance(head.position, pathPoints[0]) > segmentSize * 0.25f)
         {
             pathPoints.Insert(0, head.position);
         }
 
-        // Ограничиваем длину пути
-        while (pathPoints.Count > (bodySegments.Count + 1) * 2) // +1 для головы
+        // Maintain path length (2 points per segment + buffer)
+        int maxPathPoints = (bodySegments.Count + 1) * 3;
+        while (pathPoints.Count > maxPathPoints)
         {
             pathPoints.RemoveAt(pathPoints.Count - 1);
         }
 
-        // Обновляем позиции сегментов тела с интерполяцией
+        // Update body segments positions
         for (int i = 0; i < bodySegments.Count; i++)
         {
-            int targetIndex = Mathf.Min(i * 2 + 1, pathPoints.Count - 1); // +1 чтобы пропустить голову
-            if (targetIndex >= 1 && targetIndex < pathPoints.Count)
+            int targetIndex = Mathf.Clamp((i + 1) * 2, 0, pathPoints.Count - 1);
+
+            bodySegments[i].position = Vector3.Lerp(
+                bodySegments[i].position,
+                pathPoints[targetIndex],
+                followSmoothness * Time.deltaTime
+            );
+
+            // Calculate direction
+            Vector3 dir;
+            if (targetIndex > 0)
             {
-                bodySegments[i].position = Vector3.Lerp(
-                    bodySegments[i].position,
-                    pathPoints[targetIndex],
-                    10f * Time.deltaTime
+                dir = (pathPoints[targetIndex - 1] - pathPoints[targetIndex]).normalized;
+            }
+            else
+            {
+                dir = (head.position - bodySegments[i].position).normalized;
+            }
+
+            if (dir != Vector3.zero)
+            {
+                bodySegments[i].rotation = Quaternion.Lerp(
+                    bodySegments[i].rotation,
+                    Quaternion.LookRotation(dir),
+                    rotationLerpSpeed * Time.deltaTime
                 );
-
-                // Улучшенное определение направления
-                Vector3 dir;
-                if (targetIndex > 0)
-                {
-                    dir = (pathPoints[targetIndex - 1] - pathPoints[targetIndex]).normalized;
-                }
-                else
-                {
-                    dir = (head.position - bodySegments[i].position).normalized;
-                }
-
-                if (dir != Vector3.zero)
-                {
-                    bodySegments[i].rotation = Quaternion.Lerp(
-                        bodySegments[i].rotation,
-                        Quaternion.LookRotation(dir),
-                        rotationLerpSpeed * Time.deltaTime
-                    );
-                }
             }
         }
     }
 
     private void UpdateMesh()
     {
+        if (pathPoints.Count < 2) return;
+
         vertices.Clear();
         triangles.Clear();
         uvs.Clear();
 
-        if (pathPoints.Count < 2) return;
-
-        // Создаем кольца вершин вдоль пути
+        // Create vertex rings along the path
         for (int i = 0; i < pathPoints.Count; i++)
         {
             Quaternion rotation;
             Vector3 position = pathPoints[i];
 
-            // Улучшенное определение направления для поворотов
-            if (i == 0) // Первая точка (голова)
+            if (i == 0) // Head
             {
                 rotation = head.rotation;
             }
-            else if (i < pathPoints.Count - 1) // Средние точки
+            else if (i < pathPoints.Count - 1) // Body
             {
                 Vector3 dirToPrev = (pathPoints[i - 1] - pathPoints[i]).normalized;
                 Vector3 dirToNext = (pathPoints[i] - pathPoints[i + 1]).normalized;
-                Vector3 averagedDir = Vector3.Lerp(dirToPrev, dirToNext, cornerSmoothing).normalized;
-                rotation = Quaternion.LookRotation(averagedDir != Vector3.zero ? averagedDir : lastGoodDirection);
+                Vector3 smoothedDir = Vector3.Lerp(dirToPrev, dirToNext, cornerSmoothing).normalized;
+                rotation = Quaternion.LookRotation(smoothedDir != Vector3.zero ? smoothedDir : lastGoodDirection);
             }
-            else // Последняя точка (хвост)
+            else // Tail
             {
                 Vector3 dir = (pathPoints[i - 1] - pathPoints[i]).normalized;
                 rotation = Quaternion.LookRotation(dir != Vector3.zero ? dir : lastGoodDirection);
@@ -234,18 +217,13 @@ public class Snake : MonoBehaviour
             for (int j = 0; j < radialSegments; j++)
             {
                 float angle = j * Mathf.PI * 2f / radialSegments;
-                Vector3 localPos = new Vector3(
-                    Mathf.Cos(angle) * bodyRadius,
-                    Mathf.Sin(angle) * bodyRadius,
-                    0
-                );
-
+                Vector3 localPos = new Vector3(Mathf.Cos(angle) * bodyRadius, Mathf.Sin(angle) * bodyRadius, 0);
                 vertices.Add(position + rotation * localPos - transform.position);
                 uvs.Add(new Vector2(j / (float)(radialSegments - 1), i / (float)pathPoints.Count));
             }
         }
 
-        // Создаем треугольники для меша
+        // Create triangles
         for (int i = 0; i < pathPoints.Count - 1; i++)
         {
             for (int j = 0; j < radialSegments; j++)
@@ -264,23 +242,21 @@ public class Snake : MonoBehaviour
             }
         }
 
-        // Крышка на конце хвоста
-        if (pathPoints.Count > 1)
-        {
-            int centerIndex = vertices.Count;
-            vertices.Add(pathPoints[pathPoints.Count - 1] - transform.position);
-            uvs.Add(new Vector2(0.5f, 0.5f));
+        // Create tail cap
+        int centerIndex = vertices.Count;
+        vertices.Add(pathPoints[pathPoints.Count - 1] - transform.position);
+        uvs.Add(new Vector2(0.5f, 0.5f));
 
-            int lastRingStart = (pathPoints.Count - 1) * radialSegments;
-            for (int j = 0; j < radialSegments; j++)
-            {
-                int nextJ = (j + 1) % radialSegments;
-                triangles.Add(centerIndex);
-                triangles.Add(lastRingStart + nextJ);
-                triangles.Add(lastRingStart + j);
-            }
+        int lastRingStart = (pathPoints.Count - 1) * radialSegments;
+        for (int j = 0; j < radialSegments; j++)
+        {
+            int nextJ = (j + 1) % radialSegments;
+            triangles.Add(centerIndex);
+            triangles.Add(lastRingStart + nextJ);
+            triangles.Add(lastRingStart + j);
         }
 
+        // Update mesh
         mesh.Clear();
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
