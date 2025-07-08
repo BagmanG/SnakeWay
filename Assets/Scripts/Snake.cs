@@ -7,27 +7,27 @@ public class Snake : MonoBehaviour
     [Header("Snake Settings")]
     public int initialLength = 5;
     public float segmentSize = 1f;
-    public float bodyWidth = 0.3f;
-    public float bodyHeight = 0.2f;
-    public Color snakeColor = Color.green;
+    public float bodyRadius = 0.3f;
+    [Range(0, 1)] public float cornerSmoothing = 0.5f;
 
     [Header("Movement")]
     public float moveSpeed = 5f;
-    public float rotationSpeed = 30f;
 
     [Header("References")]
     public GameObject headPrefab;
     public Material snakeMaterial;
 
     private List<Transform> segments = new List<Transform>();
-    private List<Vector3> positions = new List<Vector3>();
+    private List<Vector3> pathPoints = new List<Vector3>();
     private Mesh mesh;
     private List<Vector3> vertices = new List<Vector3>();
     private List<int> triangles = new List<int>();
+    private List<Vector2> uvs = new List<Vector2>();
     private bool isMoving = false;
     private Vector3 moveDirection = Vector3.forward;
     private Vector3 targetPosition;
-    private List<Vector3> pathPoints = new List<Vector3>();
+    private List<Vector3> turnPoints = new List<Vector3>();
+    private const int radialSegments = 8;
 
     private void Start()
     {
@@ -39,7 +39,7 @@ public class Snake : MonoBehaviour
     {
         HandleInput();
         MoveSnake();
-        UpdateBodyPositions();
+        UpdatePath();
         UpdateMesh();
     }
 
@@ -49,9 +49,8 @@ public class Snake : MonoBehaviour
         GameObject head = Instantiate(headPrefab, transform);
         head.name = "Head";
         segments.Add(head.transform);
-        positions.Add(transform.position);
 
-        // Create initial path points
+        // Initialize path
         for (int i = 0; i < initialLength; i++)
         {
             pathPoints.Add(transform.position - Vector3.forward * i * segmentSize);
@@ -62,82 +61,17 @@ public class Snake : MonoBehaviour
         {
             GameObject segment = new GameObject($"Segment_{i}");
             segment.transform.SetParent(transform);
-            segment.transform.position = transform.position - Vector3.forward * i * segmentSize;
+            segment.transform.position = pathPoints[i];
             segments.Add(segment.transform);
-            positions.Add(segment.transform.position);
         }
     }
 
     private void GenerateMesh()
     {
         mesh = new Mesh();
+        mesh.name = "SnakeMesh";
         GetComponent<MeshFilter>().mesh = mesh;
         GetComponent<MeshRenderer>().material = snakeMaterial;
-
-        // Create vertices for straight segments only
-        for (int i = 0; i < initialLength; i++)
-        {
-            AddStraightSegmentVertices(i);
-        }
-
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
-        mesh.RecalculateNormals();
-    }
-
-    private void AddStraightSegmentVertices(int segmentIndex)
-    {
-        float width = bodyWidth;
-        float height = bodyHeight;
-
-        // Front face vertices
-        vertices.Add(new Vector3(-width / 2, -height / 2, -segmentIndex * segmentSize));
-        vertices.Add(new Vector3(width / 2, -height / 2, -segmentIndex * segmentSize));
-        vertices.Add(new Vector3(width / 2, height / 2, -segmentIndex * segmentSize));
-        vertices.Add(new Vector3(-width / 2, height / 2, -segmentIndex * segmentSize));
-
-        // Create triangles for straight segments only
-        if (segmentIndex > 0)
-        {
-            int baseIndex = segmentIndex * 4;
-
-            // Front face
-            triangles.Add(baseIndex);
-            triangles.Add(baseIndex + 1);
-            triangles.Add(baseIndex + 2);
-            triangles.Add(baseIndex);
-            triangles.Add(baseIndex + 2);
-            triangles.Add(baseIndex + 3);
-
-            // Connect to previous segment (straight connection)
-            triangles.Add(baseIndex - 4);
-            triangles.Add(baseIndex - 3);
-            triangles.Add(baseIndex);
-            triangles.Add(baseIndex - 3);
-            triangles.Add(baseIndex + 1);
-            triangles.Add(baseIndex);
-
-            triangles.Add(baseIndex - 3);
-            triangles.Add(baseIndex - 2);
-            triangles.Add(baseIndex + 1);
-            triangles.Add(baseIndex - 2);
-            triangles.Add(baseIndex + 2);
-            triangles.Add(baseIndex + 1);
-
-            triangles.Add(baseIndex - 2);
-            triangles.Add(baseIndex - 1);
-            triangles.Add(baseIndex + 2);
-            triangles.Add(baseIndex - 1);
-            triangles.Add(baseIndex + 3);
-            triangles.Add(baseIndex + 2);
-
-            triangles.Add(baseIndex - 1);
-            triangles.Add(baseIndex - 4);
-            triangles.Add(baseIndex + 3);
-            triangles.Add(baseIndex - 4);
-            triangles.Add(baseIndex);
-            triangles.Add(baseIndex + 3);
-        }
     }
 
     private void HandleInput()
@@ -146,23 +80,19 @@ public class Snake : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.W))
         {
-            if (moveDirection != Vector3.back)
-                ChangeDirection(Vector3.forward);
+            if (moveDirection != Vector3.back) ChangeDirection(Vector3.forward);
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
-            if (moveDirection != Vector3.forward)
-                ChangeDirection(Vector3.back);
+            if (moveDirection != Vector3.forward) ChangeDirection(Vector3.back);
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
-            if (moveDirection != Vector3.right)
-                ChangeDirection(Vector3.left);
+            if (moveDirection != Vector3.right) ChangeDirection(Vector3.left);
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
-            if (moveDirection != Vector3.left)
-                ChangeDirection(Vector3.right);
+            if (moveDirection != Vector3.left) ChangeDirection(Vector3.right);
         }
     }
 
@@ -171,50 +101,65 @@ public class Snake : MonoBehaviour
         moveDirection = newDirection;
         targetPosition = segments[0].position + moveDirection * segmentSize;
         isMoving = true;
-
-        // Add turn point
-        pathPoints.Insert(0, segments[0].position);
+        turnPoints.Add(segments[0].position);
     }
 
     private void MoveSnake()
     {
         if (!isMoving) return;
 
-        // Move head
         segments[0].position = Vector3.MoveTowards(
             segments[0].position,
             targetPosition,
             moveSpeed * Time.deltaTime
         );
 
-        // Instant 90° rotation
         segments[0].rotation = Quaternion.LookRotation(moveDirection);
 
         if (Vector3.Distance(segments[0].position, targetPosition) < 0.01f)
         {
             isMoving = false;
-            positions[0] = segments[0].position;
         }
     }
 
-    private void UpdateBodyPositions()
+    private void UpdatePath()
     {
-        // Update body segments with exact spacing
+        // Add new path point if head moved enough
+        if (pathPoints.Count == 0 ||
+            Vector3.Distance(segments[0].position, pathPoints[0]) > segmentSize * 0.5f)
+        {
+            pathPoints.Insert(0, segments[0].position);
+        }
+
+        // Update body segments to follow path
         for (int i = 1; i < segments.Count; i++)
         {
-            // Find target position in path
-            int targetIndex = Mathf.Min(i, pathPoints.Count - 1);
-            if (targetIndex >= 0 && targetIndex < pathPoints.Count)
+            if (i < pathPoints.Count)
             {
-                segments[i].position = pathPoints[targetIndex];
+                segments[i].position = pathPoints[i];
 
-                // Only rotate if direction changed
-                if (targetIndex > 0 && targetIndex < pathPoints.Count - 1)
+                // Calculate direction to next segment
+                if (i < pathPoints.Count - 1)
                 {
-                    Vector3 dir = (pathPoints[targetIndex - 1] - pathPoints[targetIndex]).normalized;
+                    Vector3 dir = (pathPoints[i - 1] - pathPoints[i]).normalized;
                     if (dir != Vector3.zero)
                         segments[i].rotation = Quaternion.LookRotation(dir);
                 }
+            }
+        }
+
+        // Cleanup old path points
+        while (pathPoints.Count > segments.Count * 2)
+        {
+            pathPoints.RemoveAt(pathPoints.Count - 1);
+        }
+
+        // Cleanup old turn points
+        for (int i = turnPoints.Count - 1; i >= 0; i--)
+        {
+            if (Vector3.Distance(turnPoints[i], segments[segments.Count - 1].position) > segmentSize * segments.Count)
+            {
+                turnPoints.RemoveAt(i);
             }
         }
     }
@@ -223,88 +168,84 @@ public class Snake : MonoBehaviour
     {
         vertices.Clear();
         triangles.Clear();
+        uvs.Clear();
 
-        // Create vertices for each segment
-        for (int i = 0; i < segments.Count; i++)
+        // Create circular cross-sections along the path
+        for (int i = 0; i < pathPoints.Count; i++)
         {
-            float width = bodyWidth;
-            float height = bodyHeight;
+            Vector3 position = pathPoints[i];
+            Quaternion rotation = i < segments.Count ? segments[i].rotation : segments[segments.Count - 1].rotation;
 
-            // Get segment transform
-            Vector3 pos = segments[i].position - transform.position;
-            Quaternion rot = segments[i].rotation;
-
-            // Add vertices for this segment
-            vertices.Add(pos + rot * new Vector3(-width / 2, -height / 2, 0));
-            vertices.Add(pos + rot * new Vector3(width / 2, -height / 2, 0));
-            vertices.Add(pos + rot * new Vector3(width / 2, height / 2, 0));
-            vertices.Add(pos + rot * new Vector3(-width / 2, height / 2, 0));
-
-            // Create triangles if not first segment
-            if (i > 0)
+            // Adjust rotation at turn points for smooth corners
+            if (i > 0 && i < pathPoints.Count - 1 && cornerSmoothing > 0)
             {
-                int baseIndex = i * 4;
+                Vector3 prevDir = (pathPoints[i - 1] - pathPoints[i]).normalized;
+                Vector3 nextDir = (pathPoints[i] - pathPoints[i + 1]).normalized;
 
-                // Front face
-                triangles.Add(baseIndex);
-                triangles.Add(baseIndex + 1);
-                triangles.Add(baseIndex + 2);
-                triangles.Add(baseIndex);
-                triangles.Add(baseIndex + 2);
-                triangles.Add(baseIndex + 3);
+                if (Vector3.Angle(prevDir, nextDir) > 10f)
+                {
+                    rotation = Quaternion.LookRotation(Vector3.Lerp(prevDir, nextDir, 0.5f));
+                }
+            }
 
-                // Connect to previous segment
-                triangles.Add(baseIndex - 4);
-                triangles.Add(baseIndex - 3);
-                triangles.Add(baseIndex);
-                triangles.Add(baseIndex - 3);
-                triangles.Add(baseIndex + 1);
-                triangles.Add(baseIndex);
+            // Create vertices for this cross-section
+            for (int j = 0; j < radialSegments; j++)
+            {
+                float angle = j * Mathf.PI * 2f / radialSegments;
+                Vector3 localPos = new Vector3(
+                    Mathf.Cos(angle) * bodyRadius,
+                    Mathf.Sin(angle) * bodyRadius,
+                    0
+                );
 
-                triangles.Add(baseIndex - 3);
-                triangles.Add(baseIndex - 2);
-                triangles.Add(baseIndex + 1);
-                triangles.Add(baseIndex - 2);
-                triangles.Add(baseIndex + 2);
-                triangles.Add(baseIndex + 1);
-
-                triangles.Add(baseIndex - 2);
-                triangles.Add(baseIndex - 1);
-                triangles.Add(baseIndex + 2);
-                triangles.Add(baseIndex - 1);
-                triangles.Add(baseIndex + 3);
-                triangles.Add(baseIndex + 2);
-
-                triangles.Add(baseIndex - 1);
-                triangles.Add(baseIndex - 4);
-                triangles.Add(baseIndex + 3);
-                triangles.Add(baseIndex - 4);
-                triangles.Add(baseIndex);
-                triangles.Add(baseIndex + 3);
+                vertices.Add(position + rotation * localPos - transform.position);
+                uvs.Add(new Vector2(j / (float)radialSegments, i / (float)pathPoints.Count));
             }
         }
 
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
-        mesh.RecalculateNormals();
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (segments == null || segments.Count == 0) return;
-
-        // Draw path points
-        Gizmos.color = Color.blue;
-        foreach (var point in pathPoints)
+        // Create triangles between cross-sections
+        for (int i = 0; i < pathPoints.Count - 1; i++)
         {
-            Gizmos.DrawSphere(point, 0.1f);
+            for (int j = 0; j < radialSegments; j++)
+            {
+                int nextJ = (j + 1) % radialSegments;
+                int currentBase = i * radialSegments;
+                int nextBase = (i + 1) * radialSegments;
+
+                triangles.Add(currentBase + j);
+                triangles.Add(currentBase + nextJ);
+                triangles.Add(nextBase + j);
+
+                triangles.Add(currentBase + nextJ);
+                triangles.Add(nextBase + nextJ);
+                triangles.Add(nextBase + j);
+            }
         }
 
-        // Draw segment connections
-        Gizmos.color = Color.red;
-        for (int i = 1; i < segments.Count; i++)
+        mesh.Clear();
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+        mesh.uv = uvs.ToArray();
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (pathPoints == null || pathPoints.Count == 0) return;
+
+        // Draw path
+        Gizmos.color = Color.blue;
+        for (int i = 0; i < pathPoints.Count - 1; i++)
         {
-            Gizmos.DrawLine(segments[i - 1].position, segments[i].position);
+            Gizmos.DrawLine(pathPoints[i], pathPoints[i + 1]);
+        }
+
+        // Draw turn points
+        Gizmos.color = Color.red;
+        foreach (var point in turnPoints)
+        {
+            Gizmos.DrawSphere(point, 0.1f);
         }
     }
 }
