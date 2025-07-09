@@ -67,7 +67,7 @@ public class PlayerController : MonoBehaviour
 
         if (gridPos.x >= 0 && gridPos.x < LevelManager.CurrentLevel.width &&
             gridPos.y >= 0 && gridPos.y < LevelManager.CurrentLevel.height &&
-            LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 0)
+            LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] > 0)
         {
             targetRotation = Quaternion.LookRotation(direction);
             targetPosition = newPosition;
