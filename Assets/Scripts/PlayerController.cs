@@ -7,15 +7,18 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 targetPosition;
     private Quaternion targetRotation; 
-    private bool isMoving = false; 
+    private bool isMoving = false;
 
-    void Start()
+    public GameManager GameManager;
+    public LevelManager LevelManager;
+
+    private void Start()
     {
         targetPosition = transform.position;
         targetRotation = transform.rotation;
     }
 
-    void Update()
+    private void Update()
     {
         if (isMoving)
         {

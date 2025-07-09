@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
+    public GameManager GameManager;
     public LevelData CurrentLevel;
     public GameObject[] Blocks;
     public GameObject PlayerPrefab;
@@ -29,6 +30,9 @@ public class LevelManager : MonoBehaviour
 
     private void CreatePlayer() {
         var player = Instantiate(PlayerPrefab, new Vector3(CurrentLevel.playerSpawn.x, 1, CurrentLevel.playerSpawn.y), Quaternion.identity);
+        var controller = player.GetComponent<PlayerController>();
+        controller.GameManager = GameManager;
+        controller.LevelManager = this;
     }
 
     private void CreateBlueSnake()
@@ -42,7 +46,10 @@ public class LevelManager : MonoBehaviour
             emptyObject.transform.rotation = Quaternion.identity;
             emptyObject.transform.parent = snake.transform;
         }
-        snake.GetComponent<Snake>().InitSnake();
+        var snakeController = snake.GetComponent<Snake>();
+        snakeController.GameManager = GameManager;
+        snakeController.LevelManager = this;
+        snakeController.InitSnake();
         
     }
 

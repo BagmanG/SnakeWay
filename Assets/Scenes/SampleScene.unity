@@ -149,6 +149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40a8f3a567b77464694ab437c104efd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  GameManager: {fileID: 461841813}
   CurrentLevel: {fileID: 11400000, guid: 775397891315c4041b3e3d2f8fdd3e66, type: 2}
   Blocks:
   - {fileID: 8138566737248680225, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}

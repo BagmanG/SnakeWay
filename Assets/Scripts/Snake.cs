@@ -32,7 +32,8 @@ public class Snake : MonoBehaviour
     private Vector3 lastGoodDirection = Vector3.forward;
     private float[] segmentRadii;
     private List<Vector3> segmentVelocities;
-
+    public GameManager GameManager;
+    public LevelManager LevelManager;
     public void InitSnake()
     {
         // Find head (first child object)
