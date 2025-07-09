@@ -64,7 +64,7 @@ public class LevelManager : MonoBehaviour
         {
             for (int x = 0; x < CurrentLevel.width; x++)
             {
-                if (CurrentLevel.grid[x, z] == 1)
+                if (CurrentLevel.grid[x, z] == 0)
                 {
                     GameObject block = Instantiate(Blocks[0], new Vector3(x, 0, z), Quaternion.identity);
                     block.transform.parent = this.transform;
