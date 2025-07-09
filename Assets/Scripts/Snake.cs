@@ -33,7 +33,7 @@ public class Snake : MonoBehaviour
     private float[] segmentRadii;
     private List<Vector3> segmentVelocities;
 
-    private void Start()
+    public void InitSnake()
     {
         // Find head (first child object)
         if (transform.childCount == 0)

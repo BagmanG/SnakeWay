@@ -6,6 +6,7 @@ public class LevelManager : MonoBehaviour
     public LevelData CurrentLevel;
     public GameObject[] Blocks;
     public GameObject PlayerPrefab;
+    public GameObject BlueSnakePrefab;
     public void LoadLevel()
     {
         if (CurrentLevel == null)
@@ -19,7 +20,30 @@ public class LevelManager : MonoBehaviour
 
     private void CreateEntities()
     {
+        CreatePlayer();
+        if(CurrentLevel.blueSnake.Length > 0)
+        {
+            CreateBlueSnake();
+        }
+    }
+
+    private void CreatePlayer() {
         var player = Instantiate(PlayerPrefab, new Vector3(CurrentLevel.playerSpawn.x, 1, CurrentLevel.playerSpawn.y), Quaternion.identity);
+    }
+
+    private void CreateBlueSnake()
+    {
+        var points2D = CurrentLevel.blueSnake;
+        var snake = Instantiate(BlueSnakePrefab, new Vector3(points2D[0].x, 1, points2D[0].y), Quaternion.identity);
+        for(int i = 1; i < points2D.Length; i++)
+        {
+            GameObject emptyObject = new GameObject($"Segment{i}");
+            emptyObject.transform.position = new Vector3(points2D[i].x, 1, points2D[i].y);
+            emptyObject.transform.rotation = Quaternion.identity;
+            emptyObject.transform.parent = snake.transform;
+        }
+        snake.GetComponent<Snake>().InitSnake();
+        
     }
 
     private void BuildLevel()
