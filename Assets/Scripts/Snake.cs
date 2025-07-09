@@ -34,9 +34,19 @@ public class Snake : MonoBehaviour
     private List<Vector3> segmentVelocities;
     public GameManager GameManager;
     public LevelManager LevelManager;
+
+    // Добавляем переменные для поиска пути
+    private PathFinder pathFinder;
+    private List<Vector2Int> currentPath;
+    private int currentPathIndex;
+    private Vector2Int lastPlayerPosition;
+
     public void InitSnake()
     {
-        // Find head (first child object)
+        // Инициализация пути
+        pathFinder = new PathFinder(LevelManager.CurrentLevel);
+
+        // Находим голову (первый дочерний объект)
         if (transform.childCount == 0)
         {
             Debug.LogError("No child objects found for snake!");
@@ -46,7 +56,7 @@ public class Snake : MonoBehaviour
         head = transform.GetChild(0);
         head.name = "Head";
 
-        // Find all segments (children with "Segment" in name)
+        // Находим все сегменты (дочерние объекты с "Segment" в имени)
         bodySegments = new List<Transform>();
         for (int i = 1; i < transform.childCount; i++)
         {
@@ -57,17 +67,17 @@ public class Snake : MonoBehaviour
             }
         }
 
-        // Order segments by name
+        // Сортируем сегменты по имени
         bodySegments = bodySegments.OrderBy(t => t.name).ToList();
 
-        // Initialize velocities for smooth movement
+        // Инициализируем скорости для плавного движения
         segmentVelocities = new List<Vector3>();
         for (int i = 0; i < bodySegments.Count; i++)
         {
             segmentVelocities.Add(Vector3.zero);
         }
 
-        // Calculate radii for each segment
+        // Вычисляем радиусы для каждого сегмента
         CalculateSegmentRadii();
 
         InitializePath();
@@ -104,7 +114,6 @@ public class Snake : MonoBehaviour
 
     private void Update()
     {
-        HandleInput();
         MoveSnake();
         UpdatePath();
         UpdateMesh();
@@ -119,26 +128,65 @@ public class Snake : MonoBehaviour
         mesh.MarkDynamic();
     }
 
-    private void HandleInput()
+    public void MakeMove(Vector2Int playerPosition)
     {
         if (isMoving) return;
 
-        if (Input.GetKeyDown(KeyCode.W) && moveDirection != Vector3.back)
+        // Получаем текущую позицию змейки
+        Vector2Int snakeHeadPos = new Vector2Int(
+            Mathf.RoundToInt(head.position.x),
+            Mathf.RoundToInt(head.position.z)
+        );
+
+        // Если игрок переместился или это первый ход, пересчитываем путь
+        if (playerPosition != lastPlayerPosition || currentPath == null)
         {
-            ChangeDirection(Vector3.forward);
+            lastPlayerPosition = playerPosition;
+
+            // Получаем все позиции хвоста как препятствия
+            List<Vector2Int> tailPositions = new List<Vector2Int>();
+            foreach (Transform segment in bodySegments)
+            {
+                tailPositions.Add(new Vector2Int(
+                    Mathf.RoundToInt(segment.position.x),
+                    Mathf.RoundToInt(segment.position.z)
+                ));
+            }
+
+            // Ищем путь к игроку
+            currentPath = pathFinder.FindPath(snakeHeadPos, playerPosition, tailPositions);
+            currentPathIndex = 0;
         }
-        else if (Input.GetKeyDown(KeyCode.S) && moveDirection != Vector3.forward)
+
+        // Если путь найден и есть куда двигаться
+        if (currentPath != null && currentPath.Count > 0 && currentPathIndex < currentPath.Count)
         {
-            ChangeDirection(Vector3.back);
+            Vector2Int nextPos = currentPath[currentPathIndex];
+            Vector3 direction = new Vector3(nextPos.x - snakeHeadPos.x, 0, nextPos.y - snakeHeadPos.y);
+            ChangeDirection(direction.normalized);
+            currentPathIndex++;
         }
-        else if (Input.GetKeyDown(KeyCode.A) && moveDirection != Vector3.right)
+        else
         {
-            ChangeDirection(Vector3.left);
+            // Если путь не найден, пытаемся двигаться в сторону игрока напрямую
+            Vector3 direction = new Vector3(
+                playerPosition.x - snakeHeadPos.x,
+                0,
+                playerPosition.y - snakeHeadPos.y
+            ).normalized;
+
+            // Проверяем, можно ли двигаться в этом направлении
+            Vector2Int checkPos = snakeHeadPos + new Vector2Int(
+                Mathf.RoundToInt(direction.x),
+                Mathf.RoundToInt(direction.z)
+            );
+
+            if (pathFinder.IsWalkable(checkPos))
+            {
+                ChangeDirection(direction);
+            }
         }
-        else if (Input.GetKeyDown(KeyCode.D) && moveDirection != Vector3.left)
-        {
-            ChangeDirection(Vector3.right);
-        }
+        Debug.Log("Двигаем змею");
     }
 
     private void ChangeDirection(Vector3 newDirection)

@@ -1,16 +1,20 @@
 using UnityEngine;
+using System;
 
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 5f;
-    public float rotationSpeed = 10f; 
+    public float rotationSpeed = 10f;
 
     private Vector3 targetPosition;
-    private Quaternion targetRotation; 
+    private Quaternion targetRotation;
     private bool isMoving = false;
 
     public GameManager GameManager;
     public LevelManager LevelManager;
+
+    // —обытие дл€ уведомлени€ о завершении хода
+    public event Action OnMoveComplete;
 
     private void Start()
     {
@@ -27,9 +31,12 @@ public class PlayerController : MonoBehaviour
 
             if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
             {
-                transform.position = targetPosition; 
-                transform.rotation = targetRotation; 
+                transform.position = targetPosition;
+                transform.rotation = targetRotation;
                 isMoving = false;
+
+                // ”ведомл€ем GameManager о завершении хода
+                OnMoveComplete?.Invoke();
             }
             return;
         }
@@ -54,8 +61,17 @@ public class PlayerController : MonoBehaviour
 
     void Move(Vector3 direction)
     {
-        targetRotation = Quaternion.LookRotation(direction);
-        targetPosition = transform.position + direction;
-        isMoving = true;
+        // ѕровер€ем, можно ли двигатьс€ в этом направлении
+        Vector3 newPosition = transform.position + direction;
+        Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(newPosition.x), Mathf.RoundToInt(newPosition.z));
+
+        if (gridPos.x >= 0 && gridPos.x < LevelManager.CurrentLevel.width &&
+            gridPos.y >= 0 && gridPos.y < LevelManager.CurrentLevel.height &&
+            LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 0)
+        {
+            targetRotation = Quaternion.LookRotation(direction);
+            targetPosition = newPosition;
+            isMoving = true;
+        }
     }
 }
