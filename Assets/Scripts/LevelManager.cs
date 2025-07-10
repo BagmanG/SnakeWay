@@ -75,7 +75,7 @@ public class LevelManager : MonoBehaviour
         {
             for (int x = 0; x < CurrentLevel.width; x++)
             {
-                if(CurrentLevel.grid[x, z] != 1)
+                if (CurrentLevel.grid[x, z] != 1)
                 {
                     GameObject block = Instantiate(GetObjectByID(CurrentLevel.grid[x, z]), new Vector3(x, 0, z), Quaternion.identity);
                     block.transform.parent = this.transform;
@@ -88,19 +88,24 @@ public class LevelManager : MonoBehaviour
     {
         switch (id)
         {
-            case 0:
+            case 0://Grass
                 {
                     return Blocks[0];
                 }
-            case 2:
+            case 2://Tree
                 {
                     return Blocks[1];
                 }
-            case 3:
+            case 3://Star
                 {
                     return Blocks[2];
                 }
+            case 4://Sand
+                {
+                    return Blocks[3];
+                }
         }
+
         return Blocks[0];
     }
 }

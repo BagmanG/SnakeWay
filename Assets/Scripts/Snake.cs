@@ -169,6 +169,31 @@ public class Snake : MonoBehaviour
         }
     }
 
+    private void CheckStarCollision()
+    {
+        // Получаем все объекты со StarGiver на сцене
+        StarGiver[] stars = FindObjectsOfType<StarGiver>();
+        if (stars == null || stars.Length == 0) return;
+
+        Vector2Int headPos = new Vector2Int(
+            Mathf.RoundToInt(head.position.x),
+            Mathf.RoundToInt(head.position.z)
+        );
+
+        foreach (StarGiver star in stars)
+        {
+            Vector2Int starPos = new Vector2Int(
+                Mathf.RoundToInt(star.transform.position.x),
+                Mathf.RoundToInt(star.transform.position.z)
+            );
+
+            if (headPos == starPos)
+            {
+                star.GiveSnake();
+                break;
+            }
+        }
+    }
 
 
     private void ChangeDirection(Vector3 newDirection)
@@ -210,6 +235,7 @@ public class Snake : MonoBehaviour
         if (Vector3.Distance(head.localPosition, targetPosition) < 0.01f)
         {
             isMoving = false;
+            CheckStarCollision(); // Добавляем проверку звезды
         }
     }
 

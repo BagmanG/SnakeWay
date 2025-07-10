@@ -2,13 +2,28 @@ using UnityEngine;
 
 public class StarGiver : MonoBehaviour
 {
+    public GameObject StarActive;
+    public GameObject StarPassive;
+    private GameManager GameManager;
+    private void Start()
+    {
+        GameManager = FindFirstObjectByType<GameManager>();   
+    }
+
     public void GivePlayer()
     {
-        Debug.Log("Игрок взял звезду");
+        GameManager.GivePlayerStar();
+        HideStar();
     }
 
     public void GiveSnake()
     {
-        Destroy(gameObject);
+        HideStar();
+    }
+
+    public void HideStar()
+    {
+        StarActive.SetActive(false);
+        StarPassive.SetActive(true);
     }
 }

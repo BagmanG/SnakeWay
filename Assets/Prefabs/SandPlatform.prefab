@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 9086718583637979643}
   - component: {fileID: 306207225680275017}
   m_Layer: 0
-  m_Name: Platform
+  m_Name: SandPlatform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -150,7 +150,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 2c8ac31ddc42ac343a60fc4a9afb87e9, type: 2}
+      objectReference: {fileID: 2100000, guid: 7f0be40c7a0dc054b9f1c487b038f3b8, type: 2}
     - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 

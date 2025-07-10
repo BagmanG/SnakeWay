@@ -8,8 +8,11 @@ public class GameManager : MonoBehaviour
     private Snake snake;
     private bool isPlayerTurn = true;
     public GameUI UI;
+    public int StarsCount = 0;
+    public GameObject[] Stars;
     public void Start()
     {
+        StarsCount = 0;
         LevelManager.LoadLevel();
         playerController = FindObjectOfType<PlayerController>();
         snake = FindObjectOfType<Snake>();
@@ -54,5 +57,14 @@ public class GameManager : MonoBehaviour
     public void TryAgain()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void GivePlayerStar()
+    {
+        StarsCount++;
+        for(int i = 0; i < 3;i++)
+        {
+            Stars[i].SetActive(StarsCount-1 >= i);
+        }
     }
 }

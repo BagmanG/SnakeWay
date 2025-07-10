@@ -17,12 +17,12 @@ public class PathFinder
     {
         walkableGrid = new int[levelData.width, levelData.height];
 
-        // 0 и 3 - проходимые, остальное - стены
+        // 0, 3 и 4 - проходимые, остальное - стены
         for (int x = 0; x < levelData.width; x++)
         {
             for (int y = 0; y < levelData.height; y++)
             {
-                walkableGrid[x, y] = (levelData.grid[x, y] == 0 || levelData.grid[x, y] == 3) ? 0 : 1;
+                walkableGrid[x, y] = (levelData.grid[x, y] == 0 || levelData.grid[x, y] == 3 || levelData.grid[x, y] == 4) ? 0 : 1;
             }
         }
     }

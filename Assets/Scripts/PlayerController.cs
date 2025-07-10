@@ -35,8 +35,8 @@ public class PlayerController : MonoBehaviour
                 transform.rotation = targetRotation;
                 isMoving = false;
 
-                // Проверяем столкновение после завершения движения
                 CheckSnakeCollision();
+                CheckStarCollision(); // Добавляем проверку звезды
 
                 OnMoveComplete?.Invoke();
             }
@@ -49,6 +49,32 @@ public class PlayerController : MonoBehaviour
         if (moveDirection != Vector3Int.zero)
         {
             Move(moveDirection);
+        }
+    }
+
+    private void CheckStarCollision()
+    {
+        // Получаем все объекты со StarGiver на сцене
+        StarGiver[] stars = FindObjectsOfType<StarGiver>();
+        if (stars == null || stars.Length == 0) return;
+
+        Vector2Int playerPos = new Vector2Int(
+            Mathf.RoundToInt(transform.position.x),
+            Mathf.RoundToInt(transform.position.z)
+        );
+
+        foreach (StarGiver star in stars)
+        {
+            Vector2Int starPos = new Vector2Int(
+                Mathf.RoundToInt(star.transform.position.x),
+                Mathf.RoundToInt(star.transform.position.z)
+            );
+
+            if (playerPos == starPos)
+            {
+                star.GivePlayer();
+                break;
+            }
         }
     }
 
@@ -141,7 +167,8 @@ public class PlayerController : MonoBehaviour
         if (gridPos.x >= 0 && gridPos.x < LevelManager.CurrentLevel.width &&
             gridPos.y >= 0 && gridPos.y < LevelManager.CurrentLevel.height &&
             (LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 0 ||
-             LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 3))
+             LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 3 ||
+             LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 4))
         {
             targetRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
             targetPosition = newPosition;
