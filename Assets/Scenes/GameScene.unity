@@ -558,6 +558,7 @@ MonoBehaviour:
   Blocks:
   - {fileID: 8138566737248680225, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
   - {fileID: 8138566737248680225, guid: 191e7cf7a86b992489ff1ba665e861d0, type: 3}
+  - {fileID: 8138566737248680225, guid: 7ae66fa25a8e9bd44a418af0bcaef2da, type: 3}
   PlayerPrefab: {fileID: 7221419191433761733, guid: a658c4bdaaf6e1e41858b2aa1c5de3aa, type: 3}
   BlueSnakePrefab: {fileID: 4670799170236667345, guid: e4b23bca3c00594449e2c7fe29f94774, type: 3}
   Camera: {fileID: 963194229}

@@ -31,13 +31,14 @@ public class LevelManager : MonoBehaviour
     private void CreateEntities()
     {
         CreatePlayer();
-        if(CurrentLevel.blueSnake.Length > 0)
+        if (CurrentLevel.blueSnake.Length > 0)
         {
             CreateBlueSnake();
         }
     }
 
-    private void CreatePlayer() {
+    private void CreatePlayer()
+    {
         _Player = Instantiate(PlayerPrefab, new Vector3(CurrentLevel.playerSpawn.x, 1, CurrentLevel.playerSpawn.y), Quaternion.identity);
         var controller = _Player.GetComponent<PlayerController>();
         controller.GameManager = GameManager;
@@ -49,7 +50,7 @@ public class LevelManager : MonoBehaviour
     {
         var points2D = CurrentLevel.blueSnake;
         var snake = Instantiate(BlueSnakePrefab, new Vector3(points2D[0].x, 0.73f, points2D[0].y), Quaternion.identity);
-        for(int i = 1; i < points2D.Length; i++)
+        for (int i = 1; i < points2D.Length; i++)
         {
             GameObject emptyObject = new GameObject($"Segment{i}");
             emptyObject.transform.position = new Vector3(points2D[i].x, 0.73f, points2D[i].y);
@@ -60,7 +61,7 @@ public class LevelManager : MonoBehaviour
         snakeController.GameManager = GameManager;
         snakeController.LevelManager = this;
         snakeController.InitSnake();
-        
+
     }
 
     private void BuildLevel()
@@ -74,23 +75,32 @@ public class LevelManager : MonoBehaviour
         {
             for (int x = 0; x < CurrentLevel.width; x++)
             {
-                if (CurrentLevel.grid[x, z] == 0)
+                if(CurrentLevel.grid[x, z] != 1)
                 {
-                    GameObject block = Instantiate(Blocks[0], new Vector3(x, 0, z), Quaternion.identity);
-                    block.transform.parent = this.transform;
-                }
-                //1 - Air (Empty)
-                if (CurrentLevel.grid[x, z] == 2)
-                {
-                    GameObject block = Instantiate(Blocks[1], new Vector3(x, 0, z), Quaternion.identity);
-                    block.transform.parent = this.transform;
-                }
-                if (CurrentLevel.grid[x, z] == 3)
-                {
-                    GameObject block = Instantiate(Blocks[1], new Vector3(x, 0, z), Quaternion.identity);
+                    GameObject block = Instantiate(GetObjectByID(CurrentLevel.grid[x, z]), new Vector3(x, 0, z), Quaternion.identity);
                     block.transform.parent = this.transform;
                 }
             }
         }
+    }
+
+    private GameObject GetObjectByID(int id)
+    {
+        switch (id)
+        {
+            case 0:
+                {
+                    return Blocks[0];
+                }
+            case 2:
+                {
+                    return Blocks[1];
+                }
+            case 3:
+                {
+                    return Blocks[2];
+                }
+        }
+        return Blocks[0];
     }
 }
