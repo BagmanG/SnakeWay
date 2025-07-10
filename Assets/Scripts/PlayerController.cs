@@ -34,6 +34,10 @@ public class PlayerController : MonoBehaviour
                 transform.position = targetPosition;
                 transform.rotation = targetRotation;
                 isMoving = false;
+
+                // Проверяем столкновение после завершения движения
+                CheckSnakeCollision();
+
                 OnMoveComplete?.Invoke();
             }
             return;
@@ -45,6 +49,49 @@ public class PlayerController : MonoBehaviour
         if (moveDirection != Vector3Int.zero)
         {
             Move(moveDirection);
+        }
+    }
+
+    private void CheckSnakeCollision()
+    {
+        // Получаем все объекты змей на сцене
+        Snake[] snakes = FindObjectsOfType<Snake>();
+        if (snakes == null || snakes.Length == 0) return;
+
+        Vector2Int playerPos = new Vector2Int(
+            Mathf.RoundToInt(transform.position.x),
+            Mathf.RoundToInt(transform.position.z)
+        );
+
+        foreach (Snake snake in snakes)
+        {
+            // Проверяем столкновение с головой змеи
+            Vector2Int headPos = new Vector2Int(
+                Mathf.RoundToInt(snake.transform.GetChild(0).position.x),
+                Mathf.RoundToInt(snake.transform.GetChild(0).position.z)
+            );
+
+            if (playerPos == headPos)
+            {
+                GameManager.GameOver();
+                return;
+            }
+
+            // Проверяем столкновение с хвостом змеи
+            for (int i = 1; i < snake.transform.childCount; i++)
+            {
+                Transform segment = snake.transform.GetChild(i);
+                Vector2Int segmentPos = new Vector2Int(
+                    Mathf.RoundToInt(segment.position.x),
+                    Mathf.RoundToInt(segment.position.z)
+                );
+
+                if (playerPos == segmentPos)
+                {
+                    GameManager.GameOver();
+                    return;
+                }
+            }
         }
     }
 
