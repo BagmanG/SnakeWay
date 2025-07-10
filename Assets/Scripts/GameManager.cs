@@ -67,4 +67,9 @@ public class GameManager : MonoBehaviour
             Stars[i].SetActive(StarsCount-1 >= i);
         }
     }
+
+    public void LevelCompleted()
+    {
+        Debug.Log("Level Completed!");
+    }
 }

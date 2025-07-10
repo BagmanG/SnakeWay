@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
 
                 CheckSnakeCollision();
                 CheckStarCollision(); // Добавляем проверку звезды
-
+                CheckTileAfterMovement();
                 OnMoveComplete?.Invoke();
             }
             return;
@@ -118,6 +118,21 @@ public class PlayerController : MonoBehaviour
                     return;
                 }
             }
+        }
+    }
+
+    private void CheckTileAfterMovement()
+    {
+        Vector2Int currentPos = new Vector2Int(
+            Mathf.RoundToInt(transform.position.x),
+            Mathf.RoundToInt(transform.position.z)
+        );
+
+        // Проверяем, стоит ли игрок на элементе с ID 4 и есть ли звезды
+        if (LevelManager.CurrentLevel.grid[currentPos.x, currentPos.y] == 4 &&
+            GameManager.StarsCount > 0)
+        {
+            GameManager.LevelCompleted();
         }
     }
 
