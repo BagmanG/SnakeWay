@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
     private PlayerController playerController;
     private Snake snake;
     private bool isPlayerTurn = true;
-
+    public GameUI UI;
     public void Start()
     {
         LevelManager.LoadLevel();
@@ -21,7 +21,6 @@ public class GameManager : MonoBehaviour
 
     private void OnPlayerMoveComplete()
     {
-        Debug.Log("Ход змейки");
         // Ход игрока завершен, теперь ход змейки
         isPlayerTurn = false;
 
@@ -44,5 +43,10 @@ public class GameManager : MonoBehaviour
         {
             playerController.OnMoveComplete -= OnPlayerMoveComplete;
         }
+    }
+
+    public void GameOver()
+    {
+        UI.ShowGameOver();
     }
 }

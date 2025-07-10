@@ -49,7 +49,7 @@ public class CameraController : MonoBehaviour
         if (target)
         {
             // Вращение камеры при зажатой правой кнопке мыши
-            if (Input.GetMouseButton(1))
+            if (Input.GetMouseButton(0))
             {
                 x += Input.GetAxis("Mouse X") * xSpeed * 0.02f;
                 y -= Input.GetAxis("Mouse Y") * ySpeed * 0.02f;
