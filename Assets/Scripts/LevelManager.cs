@@ -38,11 +38,11 @@ public class LevelManager : MonoBehaviour
     private void CreateBlueSnake()
     {
         var points2D = CurrentLevel.blueSnake;
-        var snake = Instantiate(BlueSnakePrefab, new Vector3(points2D[0].x, 1, points2D[0].y), Quaternion.identity);
+        var snake = Instantiate(BlueSnakePrefab, new Vector3(points2D[0].x, 0.73f, points2D[0].y), Quaternion.identity);
         for(int i = 1; i < points2D.Length; i++)
         {
             GameObject emptyObject = new GameObject($"Segment{i}");
-            emptyObject.transform.position = new Vector3(points2D[i].x, 1, points2D[i].y);
+            emptyObject.transform.position = new Vector3(points2D[i].x, 0.73f, points2D[i].y);
             emptyObject.transform.rotation = Quaternion.identity;
             emptyObject.transform.parent = snake.transform;
         }
@@ -67,6 +67,17 @@ public class LevelManager : MonoBehaviour
                 if (CurrentLevel.grid[x, z] == 0)
                 {
                     GameObject block = Instantiate(Blocks[0], new Vector3(x, 0, z), Quaternion.identity);
+                    block.transform.parent = this.transform;
+                }
+                //1 - Air (Empty)
+                if (CurrentLevel.grid[x, z] == 2)
+                {
+                    GameObject block = Instantiate(Blocks[1], new Vector3(x, 0, z), Quaternion.identity);
+                    block.transform.parent = this.transform;
+                }
+                if (CurrentLevel.grid[x, z] == 3)
+                {
+                    GameObject block = Instantiate(Blocks[1], new Vector3(x, 0, z), Quaternion.identity);
                     block.transform.parent = this.transform;
                 }
             }
