@@ -8,6 +8,9 @@ public class LevelManager : MonoBehaviour
     public GameObject[] Blocks;
     public GameObject PlayerPrefab;
     public GameObject BlueSnakePrefab;
+    public CameraController Camera;
+
+    private GameObject _Player;
     public void LoadLevel()
     {
         if (CurrentLevel == null)
@@ -17,6 +20,12 @@ public class LevelManager : MonoBehaviour
         }
         BuildLevel();
         CreateEntities();
+        InitCamera();
+    }
+
+    private void InitCamera()
+    {
+        Camera.target = _Player.transform;
     }
 
     private void CreateEntities()
@@ -29,10 +38,11 @@ public class LevelManager : MonoBehaviour
     }
 
     private void CreatePlayer() {
-        var player = Instantiate(PlayerPrefab, new Vector3(CurrentLevel.playerSpawn.x, 1, CurrentLevel.playerSpawn.y), Quaternion.identity);
-        var controller = player.GetComponent<PlayerController>();
+        _Player = Instantiate(PlayerPrefab, new Vector3(CurrentLevel.playerSpawn.x, 1, CurrentLevel.playerSpawn.y), Quaternion.identity);
+        var controller = _Player.GetComponent<PlayerController>();
         controller.GameManager = GameManager;
         controller.LevelManager = this;
+        controller.cameraController = Camera;
     }
 
     private void CreateBlueSnake()

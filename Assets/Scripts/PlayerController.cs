@@ -12,8 +12,8 @@ public class PlayerController : MonoBehaviour
 
     public GameManager GameManager;
     public LevelManager LevelManager;
+    public CameraController cameraController; // —сылка на контроллер камеры
 
-    // —обытие дл€ уведомлени€ о завершении хода
     public event Action OnMoveComplete;
 
     private void Start()
@@ -34,32 +34,58 @@ public class PlayerController : MonoBehaviour
                 transform.position = targetPosition;
                 transform.rotation = targetRotation;
                 isMoving = false;
-
-                // ”ведомл€ем GameManager о завершении хода
                 OnMoveComplete?.Invoke();
             }
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.W))
+        // ѕолучаем направление движени€ относительно камеры
+        Vector3Int moveDirection = GetCameraRelativeGridDirection();
+
+        if (moveDirection != Vector3Int.zero)
         {
-            Move(Vector3.forward);
-        }
-        else if (Input.GetKeyDown(KeyCode.S))
-        {
-            Move(Vector3.back);
-        }
-        else if (Input.GetKeyDown(KeyCode.A))
-        {
-            Move(Vector3.left);
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            Move(Vector3.right);
+            Move(moveDirection);
         }
     }
 
-    void Move(Vector3 direction)
+    Vector3Int GetCameraRelativeGridDirection()
+    {
+        // ѕолучаем базовые направлени€ камеры (без наклона вверх/вниз)
+        Vector3 forward = cameraController.transform.forward;
+        Vector3 right = cameraController.transform.right;
+        forward.y = 0;
+        right.y = 0;
+        forward.Normalize();
+        right.Normalize();
+
+        // ќпредел€ем, какое направление выбрано (WASD)
+        bool moveForward = Input.GetKeyDown(KeyCode.W);
+        bool moveBackward = Input.GetKeyDown(KeyCode.S);
+        bool moveLeft = Input.GetKeyDown(KeyCode.A);
+        bool moveRight = Input.GetKeyDown(KeyCode.D);
+
+        // ¬ыбираем ближайшую ось (X или Z) дл€ дискретного движени€
+        if (moveForward || moveBackward)
+        {
+            // ƒвижение вперед/назад по наиболее выраженной оси камеры
+            if (Mathf.Abs(forward.x) > Mathf.Abs(forward.z))
+                return new Vector3Int((int)Mathf.Sign(forward.x), 0, 0) * (moveForward ? 1 : -1);
+            else
+                return new Vector3Int(0, 0, (int)Mathf.Sign(forward.z)) * (moveForward ? 1 : -1);
+        }
+        else if (moveLeft || moveRight)
+        {
+            // ƒвижение влево/вправо по наиболее выраженной оси камеры
+            if (Mathf.Abs(right.x) > Mathf.Abs(right.z))
+                return new Vector3Int((int)Mathf.Sign(right.x), 0, 0) * (moveRight ? 1 : -1);
+            else
+                return new Vector3Int(0, 0, (int)Mathf.Sign(right.z)) * (moveRight ? 1 : -1);
+        }
+
+        return Vector3Int.zero;
+    }
+
+    void Move(Vector3Int direction)
     {
         // ѕровер€ем, можно ли двигатьс€ в этом направлении
         Vector3 newPosition = transform.position + direction;
@@ -69,7 +95,7 @@ public class PlayerController : MonoBehaviour
             gridPos.y >= 0 && gridPos.y < LevelManager.CurrentLevel.height &&
             LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 0)
         {
-            targetRotation = Quaternion.LookRotation(direction);
+            targetRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
             targetPosition = newPosition;
             isMoving = true;
         }
