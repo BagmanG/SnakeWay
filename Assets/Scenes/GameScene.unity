@@ -629,7 +629,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GameManager: {fileID: 461841813}
-  CurrentLevel: {fileID: 11400000, guid: 756e9b9b1527d50409d52e98db980ee4, type: 2}
+  CurrentLevel: {fileID: 11400000, guid: 4d7bfa2225bf452499dc81af33c142cc, type: 2}
   Blocks:
   - {fileID: 8138566737248680225, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
   - {fileID: 8138566737248680225, guid: 191e7cf7a86b992489ff1ba665e861d0, type: 3}
