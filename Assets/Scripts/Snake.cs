@@ -70,6 +70,18 @@ public class Snake : MonoBehaviour
         // Сортируем сегменты по имени
         bodySegments = bodySegments.OrderBy(t => t.name).ToList();
 
+        // Автоматически определяем начальный поворот головы
+        if (bodySegments.Count > 0)
+        {
+            Vector3 directionToFirstSegment = (head.position-bodySegments[0].position).normalized;
+            if (directionToFirstSegment != Vector3.zero)
+            {
+                head.rotation = Quaternion.LookRotation(directionToFirstSegment);
+                lastGoodDirection = directionToFirstSegment;
+                moveDirection = directionToFirstSegment;
+            }
+        }
+
         // Инициализируем скорости для плавного движения
         segmentVelocities = new List<Vector3>();
         for (int i = 0; i < bodySegments.Count; i++)
