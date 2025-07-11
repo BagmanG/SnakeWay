@@ -10,7 +10,6 @@ public class LevelData : ScriptableObject
     public int[] serializedGrid;
 
     public Vector2[] blueSnake;
-
     public void ConvertTo2D()
     {
         grid = new int[width, height];

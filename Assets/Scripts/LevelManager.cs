@@ -100,9 +100,17 @@ public class LevelManager : MonoBehaviour
                 {
                     return Blocks[2];
                 }
-            case 4://Sand
+            case 4://Finish
                 {
                     return Blocks[3];
+                }
+            case 5://Bushes
+                {
+                    return Blocks[4];
+                }
+            case 6://Fir Trees
+                {
+                    return Blocks[5];
                 }
         }
 

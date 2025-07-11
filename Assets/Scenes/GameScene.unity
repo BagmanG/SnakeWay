@@ -629,12 +629,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GameManager: {fileID: 461841813}
-  CurrentLevel: {fileID: 11400000, guid: 775397891315c4041b3e3d2f8fdd3e66, type: 2}
+  CurrentLevel: {fileID: 11400000, guid: 756e9b9b1527d50409d52e98db980ee4, type: 2}
   Blocks:
   - {fileID: 8138566737248680225, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
   - {fileID: 8138566737248680225, guid: 191e7cf7a86b992489ff1ba665e861d0, type: 3}
   - {fileID: 8138566737248680225, guid: 7ae66fa25a8e9bd44a418af0bcaef2da, type: 3}
   - {fileID: 8138566737248680225, guid: 835c9c8b0ca8ed040b69ba3b8056f181, type: 3}
+  - {fileID: 8138566737248680225, guid: 7e1a0beb426d3ab41bd91b0d18ace1f9, type: 3}
+  - {fileID: 8138566737248680225, guid: e2af6027c49121b4ea9c19ef31b6c2e3, type: 3}
   PlayerPrefab: {fileID: 7221419191433761733, guid: a658c4bdaaf6e1e41858b2aa1c5de3aa, type: 3}
   BlueSnakePrefab: {fileID: 4670799170236667345, guid: e4b23bca3c00594449e2c7fe29f94774, type: 3}
   Camera: {fileID: 963194229}
