@@ -112,6 +112,10 @@ public class LevelManager : MonoBehaviour
                 {
                     return Blocks[5];
                 }
+            case 7://ICE
+                {
+                    return Blocks[6];
+                }
         }
 
         return Blocks[0];

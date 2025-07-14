@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -77,7 +78,44 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    private bool CheckIceSlide(Vector3Int direction)
+    {
+        Vector2Int currentPos = new Vector2Int(
+            Mathf.RoundToInt(transform.position.x),
+            Mathf.RoundToInt(transform.position.z)
+        );
 
+        // Проверяем, стоим ли мы на льду (ID 7)
+        if (LevelManager.CurrentLevel.grid[currentPos.x, currentPos.y] != 7)
+            return false;
+
+        // Используем цикл вместо рекурсии для проверки скольжения
+        while (true)
+        {
+            // Проверяем следующий блок в направлении движения
+            Vector2Int nextPos = currentPos + new Vector2Int(direction.x, direction.z);
+
+            // Если следующий блок за пределами уровня или не проходимый - останавливаемся
+            if (nextPos.x < 0 || nextPos.x >= LevelManager.CurrentLevel.width ||
+                nextPos.y < 0 || nextPos.y >= LevelManager.CurrentLevel.height ||
+                (LevelManager.CurrentLevel.grid[nextPos.x, nextPos.y] != 0 &&
+                 LevelManager.CurrentLevel.grid[nextPos.x, nextPos.y] != 3 &&
+                 LevelManager.CurrentLevel.grid[nextPos.x, nextPos.y] != 4 &&
+                 LevelManager.CurrentLevel.grid[nextPos.x, nextPos.y] != 7))
+            {
+                return false;
+            }
+
+            // Если следующий блок не лед - это конечная точка скольжения
+            if (LevelManager.CurrentLevel.grid[nextPos.x, nextPos.y] != 7)
+            {
+                return true;
+            }
+
+            // Продолжаем проверять следующий блок
+            currentPos = nextPos;
+        }
+    }
     private void CheckSnakeCollision()
     {
         // Получаем все объекты змей на сцене
@@ -175,7 +213,6 @@ public class PlayerController : MonoBehaviour
 
     void Move(Vector3Int direction)
     {
-        // Проверяем, можно ли двигаться в этом направлении
         Vector3 newPosition = transform.position + direction;
         Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(newPosition.x), Mathf.RoundToInt(newPosition.z));
 
@@ -183,11 +220,37 @@ public class PlayerController : MonoBehaviour
             gridPos.y >= 0 && gridPos.y < LevelManager.CurrentLevel.height &&
             (LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 0 ||
              LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 3 ||
-             LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 4))
+             LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 4 ||
+             LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 7))
         {
             targetRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
             targetPosition = newPosition;
             isMoving = true;
+
+            // Если мы движемся на лед, проверяем скольжение
+            if (LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 7)
+            {
+                StartCoroutine(CheckSlideAfterMove(direction));
+            }
+        }
+    }
+
+    private IEnumerator CheckSlideAfterMove(Vector3Int direction)
+    {
+        // Ждем завершения текущего движения
+        while (isMoving)
+        {
+            yield return null;
+        }
+
+        // Проверяем, нужно ли скользить дальше
+        if (CheckIceSlide(direction))
+        {
+            // Добавляем небольшую задержку для визуального эффекта
+            yield return new WaitForSeconds(0.1f);
+
+            // Продолжаем движение в том же направлении
+            Move(direction);
         }
     }
 }

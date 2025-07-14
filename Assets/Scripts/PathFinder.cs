@@ -22,7 +22,7 @@ public class PathFinder
         {
             for (int y = 0; y < levelData.height; y++)
             {
-                walkableGrid[x, y] = (levelData.grid[x, y] == 0 || levelData.grid[x, y] == 3 || levelData.grid[x, y] == 4) ? 0 : 1;
+                walkableGrid[x, y] = (levelData.grid[x, y] == 0 || levelData.grid[x, y] == 3 || levelData.grid[x, y] == 4 || levelData.grid[x, y] == 7) ? 0 : 1;
             }
         }
     }
