@@ -23,6 +23,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            PauseGame();
+        }
+    }
+
     private void OnPlayerMoveComplete()
     {
         // Ход игрока завершен, теперь ход змейки
@@ -71,5 +79,10 @@ public class GameManager : MonoBehaviour
     public void LevelCompleted()
     {
         Debug.Log("Level Completed!");
+    }
+
+    public void PauseGame()
+    {
+        UI.SetPauseVisible(!UI.PauseVisible);
     }
 }
