@@ -42,9 +42,14 @@ public class GameManager : MonoBehaviour
             Mathf.RoundToInt(playerController.transform.position.z)
         );
 
-        if(snake != null)
-        // Двигаем змейку
-        snake.MakeMove(playerPosition);
+        if (snake != null)
+        {
+            // Двигаем змейку
+            snake.MakeMove(playerPosition);
+
+            // Немедленная проверка столкновения после хода змейки
+            snake.CheckPlayerCollision();
+        }
 
         // Возвращаем ход игроку
         isPlayerTurn = true;

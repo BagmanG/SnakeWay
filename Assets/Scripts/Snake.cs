@@ -181,6 +181,29 @@ public class Snake : MonoBehaviour
         }
     }
 
+    public void CheckPlayerCollision()
+    {
+        PlayerController player = FindObjectOfType<PlayerController>();
+        if (player == null) return;
+
+        // Проверяем столкновение головы с игроком
+        if (Vector3.Distance(head.position, player.transform.position) < 0.7f)
+        {
+            GameManager.GameOver();
+            return;
+        }
+
+        // Проверяем столкновение хвоста с игроком
+        foreach (Transform segment in bodySegments)
+        {
+            if (Vector3.Distance(segment.position, player.transform.position) < 0.7f)
+            {
+                GameManager.GameOver();
+                return;
+            }
+        }
+    }
+
     private void CheckStarCollision()
     {
         // Получаем все объекты со StarGiver на сцене
@@ -240,7 +263,7 @@ public class Snake : MonoBehaviour
         }
 
         if (!isMoving) return;
-
+        CheckPlayerCollision();
         // Move head
         head.localPosition = Vector3.MoveTowards(head.localPosition, targetPosition, moveSpeed * Time.deltaTime);
 
@@ -248,6 +271,7 @@ public class Snake : MonoBehaviour
         {
             isMoving = false;
             CheckStarCollision(); // Добавляем проверку звезды
+            CheckPlayerCollision();
         }
     }
 
