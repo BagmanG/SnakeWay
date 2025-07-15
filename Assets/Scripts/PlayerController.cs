@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     public GameManager GameManager;
     public LevelManager LevelManager;
     public CameraController cameraController;
-
+    public Animator animator;
     public event Action OnMoveComplete;
 
     private void Start()
@@ -66,7 +66,7 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator WaitMove()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);
         canMove = true;
     }
 
@@ -210,7 +210,11 @@ public class PlayerController : MonoBehaviour
 
     void Move(Vector3Int direction)
     {
-        canMove = false;
+        if (canMove == true)
+        {
+            canMove = false;
+            animator.SetTrigger("Jump");
+        }
         Vector3 newPosition = transform.position + direction;
         Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(newPosition.x), Mathf.RoundToInt(newPosition.z));
 
