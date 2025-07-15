@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviour
     public Animator animator;
     public event Action OnMoveComplete;
 
+    private bool isPerformingAction = false;
+    private Vector3Int currentMoveDirection;
+
     private void Start()
     {
         targetPosition = transform.position;
@@ -31,7 +34,6 @@ public class PlayerController : MonoBehaviour
             transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
-            // Проверяем столкновение каждый кадр во время движения
             CheckSnakeCollision();
 
             if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
@@ -40,34 +42,121 @@ public class PlayerController : MonoBehaviour
                 transform.rotation = targetRotation;
                 isMoving = false;
 
-                CheckSnakeCollision(); // Дополнительная проверка после остановки
+                CheckSnakeCollision();
                 CheckStarCollision();
                 CheckTileAfterMovement();
-                OnMoveComplete?.Invoke();
-                if (canMove != true)
-                GoWaitMove();
+
+                // Проверяем, нужно ли продолжать скольжение
+                if (IsOnIce() && ShouldContinueSlide(currentMoveDirection))
+                {
+                    StartCoroutine(ContinueSlide(currentMoveDirection));
+                }
+                else
+                {
+                    CompletePlayerAction();
+                }
             }
             return;
         }
 
-
-        Vector3Int moveDirection = GetCameraRelativeGridDirection();
-
-        if (moveDirection != Vector3Int.zero)
+        if (!isPerformingAction && canMove)
         {
-            Move(moveDirection);
+            Vector3Int moveDirection = GetCameraRelativeGridDirection();
+            if (moveDirection != Vector3Int.zero)
+            {
+                StartPlayerAction(moveDirection);
+            }
         }
     }
 
-    private void GoWaitMove()
+    private void StartPlayerAction(Vector3Int direction)
     {
-        StartCoroutine(WaitMove());
+        isPerformingAction = true;
+        canMove = false;
+        currentMoveDirection = direction;
+        animator.SetTrigger("Jump");
+
+        Vector3 newPosition = transform.position + direction;
+        Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(newPosition.x), Mathf.RoundToInt(newPosition.z));
+
+        if (IsPositionValid(gridPos))
+        {
+            targetRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
+            targetPosition = newPosition;
+            isMoving = true;
+        }
+        else
+        {
+            CompletePlayerAction();
+        }
     }
 
-    private IEnumerator WaitMove()
+    private void CompletePlayerAction()
     {
-        yield return new WaitForSeconds(0.3f);
+        isPerformingAction = false;
+        OnMoveComplete?.Invoke();
+        StartCoroutine(EnableMovementAfterDelay(0.2f));
+    }
+
+    private IEnumerator EnableMovementAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
         canMove = true;
+    }
+
+    private IEnumerator ContinueSlide(Vector3Int direction)
+    {
+        yield return new WaitForSeconds(0.1f);
+        Vector3 newPosition = transform.position + direction;
+        Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(newPosition.x), Mathf.RoundToInt(newPosition.z));
+
+        if (IsPositionValid(gridPos))
+        {
+            targetPosition = newPosition;
+            isMoving = true;
+        }
+        else
+        {
+            CompletePlayerAction();
+        }
+    }
+
+    private bool IsOnIce()
+    {
+        Vector2Int currentPos = new Vector2Int(
+            Mathf.RoundToInt(transform.position.x),
+            Mathf.RoundToInt(transform.position.z)
+        );
+        return LevelManager.CurrentLevel.grid[currentPos.x, currentPos.y] == 7;
+    }
+
+    private bool ShouldContinueSlide(Vector3Int direction)
+    {
+        Vector2Int currentPos = new Vector2Int(
+            Mathf.RoundToInt(transform.position.x),
+            Mathf.RoundToInt(transform.position.z)
+        );
+
+        Vector2Int nextPos = currentPos + new Vector2Int(direction.x, direction.z);
+
+        if (nextPos.x < 0 || nextPos.x >= LevelManager.CurrentLevel.width ||
+            nextPos.y < 0 || nextPos.y >= LevelManager.CurrentLevel.height)
+        {
+            return false;
+        }
+
+        int nextTile = LevelManager.CurrentLevel.grid[nextPos.x, nextPos.y];
+        return nextTile == 0 || nextTile == 3 || nextTile == 4 || nextTile == 7;
+    }
+
+    private bool IsPositionValid(Vector2Int gridPos)
+    {
+        return gridPos.x >= 0 && gridPos.x < LevelManager.CurrentLevel.width &&
+               gridPos.y >= 0 && gridPos.y < LevelManager.CurrentLevel.height &&
+               (LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 0 ||
+                LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 3 ||
+                LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 4 ||
+                LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 7);
     }
 
     private void CheckStarCollision()
@@ -95,50 +184,15 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private bool CheckIceSlide(Vector3Int direction)
-    {
-        Vector2Int currentPos = new Vector2Int(
-            Mathf.RoundToInt(transform.position.x),
-            Mathf.RoundToInt(transform.position.z)
-        );
-
-        if (LevelManager.CurrentLevel.grid[currentPos.x, currentPos.y] != 7)
-            return false;
-
-        while (true)
-        {
-            Vector2Int nextPos = currentPos + new Vector2Int(direction.x, direction.z);
-
-            if (nextPos.x < 0 || nextPos.x >= LevelManager.CurrentLevel.width ||
-                nextPos.y < 0 || nextPos.y >= LevelManager.CurrentLevel.height ||
-                (LevelManager.CurrentLevel.grid[nextPos.x, nextPos.y] != 0 &&
-                 LevelManager.CurrentLevel.grid[nextPos.x, nextPos.y] != 3 &&
-                 LevelManager.CurrentLevel.grid[nextPos.x, nextPos.y] != 4 &&
-                 LevelManager.CurrentLevel.grid[nextPos.x, nextPos.y] != 7))
-            {
-                return false;
-            }
-
-            if (LevelManager.CurrentLevel.grid[nextPos.x, nextPos.y] != 7)
-            {
-                return true;
-            }
-
-            currentPos = nextPos;
-        }
-    }
-
     private void CheckSnakeCollision()
     {
         Snake[] snakes = FindObjectsOfType<Snake>();
         if (snakes == null || snakes.Length == 0) return;
 
-        // Используем текущую позицию игрока, а не округленную
         Vector3 playerPos = transform.position;
 
         foreach (Snake snake in snakes)
         {
-            // Проверяем столкновение с головой змеи
             Transform snakeHead = snake.transform.GetChild(0);
             if (Vector3.Distance(playerPos, snakeHead.position) < 0.5f)
             {
@@ -146,7 +200,6 @@ public class PlayerController : MonoBehaviour
                 return;
             }
 
-            // Проверяем столкновение с хвостом змеи
             for (int i = 1; i < snake.transform.childCount; i++)
             {
                 Transform segment = snake.transform.GetChild(i);
@@ -175,9 +228,6 @@ public class PlayerController : MonoBehaviour
 
     Vector3Int GetCameraRelativeGridDirection()
     {
-        if (canMove == false)
-            return Vector3Int.zero;
-
         Vector3 forward = cameraController.transform.forward;
         Vector3 right = cameraController.transform.right;
         forward.y = 0;
@@ -206,47 +256,5 @@ public class PlayerController : MonoBehaviour
         }
 
         return Vector3Int.zero;
-    }
-
-    void Move(Vector3Int direction)
-    {
-        if (canMove == true)
-        {
-            canMove = false;
-            animator.SetTrigger("Jump");
-        }
-        Vector3 newPosition = transform.position + direction;
-        Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(newPosition.x), Mathf.RoundToInt(newPosition.z));
-
-        if (gridPos.x >= 0 && gridPos.x < LevelManager.CurrentLevel.width &&
-            gridPos.y >= 0 && gridPos.y < LevelManager.CurrentLevel.height &&
-            (LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 0 ||
-             LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 3 ||
-             LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 4 ||
-             LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 7))
-        {
-            targetRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-            targetPosition = newPosition;
-            isMoving = true;
-
-            if (LevelManager.CurrentLevel.grid[gridPos.x, gridPos.y] == 7)
-            {
-                StartCoroutine(CheckSlideAfterMove(direction));
-            }
-        }
-    }
-
-    private IEnumerator CheckSlideAfterMove(Vector3Int direction)
-    {
-        while (isMoving)
-        {
-            yield return null;
-        }
-
-        if (CheckIceSlide(direction))
-        {
-            yield return new WaitForSeconds(0.1f);
-            Move(direction);
-        }
     }
 }
