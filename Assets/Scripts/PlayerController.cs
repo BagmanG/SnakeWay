@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 targetPosition;
     private Quaternion targetRotation;
     private bool isMoving = false;
-
+    private bool canMove = true;
     public GameManager GameManager;
     public LevelManager LevelManager;
     public CameraController cameraController;
@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
     {
         targetPosition = transform.position;
         targetRotation = transform.rotation;
+        canMove = true;
     }
 
     private void Update()
@@ -43,9 +44,12 @@ public class PlayerController : MonoBehaviour
                 CheckStarCollision();
                 CheckTileAfterMovement();
                 OnMoveComplete?.Invoke();
+                if (canMove != true)
+                GoWaitMove();
             }
             return;
         }
+
 
         Vector3Int moveDirection = GetCameraRelativeGridDirection();
 
@@ -53,6 +57,17 @@ public class PlayerController : MonoBehaviour
         {
             Move(moveDirection);
         }
+    }
+
+    private void GoWaitMove()
+    {
+        StartCoroutine(WaitMove());
+    }
+
+    private IEnumerator WaitMove()
+    {
+        yield return new WaitForSeconds(0.5f);
+        canMove = true;
     }
 
     private void CheckStarCollision()
@@ -160,6 +175,9 @@ public class PlayerController : MonoBehaviour
 
     Vector3Int GetCameraRelativeGridDirection()
     {
+        if (canMove == false)
+            return Vector3Int.zero;
+
         Vector3 forward = cameraController.transform.forward;
         Vector3 right = cameraController.transform.right;
         forward.y = 0;
@@ -192,6 +210,7 @@ public class PlayerController : MonoBehaviour
 
     void Move(Vector3Int direction)
     {
+        canMove = false;
         Vector3 newPosition = transform.position + direction;
         Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(newPosition.x), Mathf.RoundToInt(newPosition.z));
 
