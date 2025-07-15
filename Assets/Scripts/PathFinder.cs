@@ -38,10 +38,10 @@ public class PathFinder
 
     public List<Vector2Int> FindPath(Vector2Int start, Vector2Int target, List<Vector2Int> obstacles)
     {
-        // Создаем временную сетку с учетом препятствий
+        // Создаем временную сетку с учетом всех препятствий
         int[,] tempGrid = (int[,])walkableGrid.Clone();
 
-        // Добавляем хвост змейки как препятствия
+        // Добавляем все препятствия
         foreach (var obstacle in obstacles)
         {
             if (obstacle.x >= 0 && obstacle.x < levelData.width &&
@@ -51,7 +51,7 @@ public class PathFinder
             }
         }
 
-        // Реализация алгоритма A* для поиска пути
+        // Остальная часть метода остается без изменений
         var path = new List<Vector2Int>();
         var openSet = new PriorityQueue();
         var closedSet = new HashSet<Vector2Int>();
@@ -59,7 +59,6 @@ public class PathFinder
         var gScore = new Dictionary<Vector2Int, float>();
         var fScore = new Dictionary<Vector2Int, float>();
 
-        // Инициализация
         gScore[start] = 0;
         fScore[start] = HeuristicCostEstimate(start, target);
         openSet.Enqueue(new Node(start, fScore[start]));
@@ -70,7 +69,6 @@ public class PathFinder
 
             if (current == target)
             {
-                // Восстанавливаем путь
                 path = ReconstructPath(cameFrom, current);
                 return path;
             }
@@ -105,7 +103,6 @@ public class PathFinder
             }
         }
 
-        // Путь не найден
         return null;
     }
 

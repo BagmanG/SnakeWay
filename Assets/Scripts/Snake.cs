@@ -34,7 +34,10 @@ public class Snake : MonoBehaviour
     private List<Vector3> segmentVelocities;
     public GameManager GameManager;
     public LevelManager LevelManager;
-
+    public bool IsMoving()
+    {
+        return isMoving;
+    }
     // Добавляем переменные для поиска пути
     private PathFinder pathFinder;
     private List<Vector2Int> currentPath;
@@ -149,24 +152,30 @@ public class Snake : MonoBehaviour
             Mathf.RoundToInt(head.position.z)
         );
 
-        // Всегда пересчитываем путь, чтобы учитывать новые препятствия
-        lastPlayerPosition = playerPosition;
-
-        // Получаем позиции хвоста как препятствия
-        List<Vector2Int> tailPositions = new List<Vector2Int>();
-        foreach (Transform segment in bodySegments)
+        // Получаем позиции всех сегментов всех змей (включая текущую)
+        List<Vector2Int> allSnakeSegments = new List<Vector2Int>();
+        Snake[] allSnakes = FindObjectsOfType<Snake>();
+        foreach (Snake snake in allSnakes)
         {
-            tailPositions.Add(new Vector2Int(
-                Mathf.RoundToInt(segment.position.x),
-                Mathf.RoundToInt(segment.position.z)
-            ));
+            for (int i = 0; i < snake.transform.childCount; i++)
+            {
+                Transform segment = snake.transform.GetChild(i);
+                Vector2Int segmentPos = new Vector2Int(
+                    Mathf.RoundToInt(segment.position.x),
+                    Mathf.RoundToInt(segment.position.z)
+                );
+
+                // Для текущей змеи добавляем только сегменты тела (не голову)
+                if (snake == this && i == 0) continue;
+
+                allSnakeSegments.Add(segmentPos);
+            }
         }
 
-        // Ищем путь к игроку
-        currentPath = pathFinder.FindPath(snakeHeadPos, playerPosition, tailPositions);
+        // Ищем путь к игроку, учитывая все занятые клетки
+        currentPath = pathFinder.FindPath(snakeHeadPos, playerPosition, allSnakeSegments);
         currentPathIndex = 0;
 
-        // Если путь найден - двигаемся по нему
         if (currentPath != null && currentPath.Count > 0)
         {
             Vector2Int nextPos = currentPath[0];
@@ -175,7 +184,6 @@ public class Snake : MonoBehaviour
         }
         else
         {
-            // Если пути нет - остаемся на месте
             isMoving = false;
             Debug.Log("Нет возможного пути, змея остается на месте");
         }
@@ -193,9 +201,10 @@ public class Snake : MonoBehaviour
             return;
         }
 
-        // Проверяем столкновение хвоста с игроком
-        foreach (Transform segment in bodySegments)
+        // Проверяем столкновение тела с игроком
+        for (int i = 1; i < transform.childCount; i++)
         {
+            Transform segment = transform.GetChild(i);
             if (Vector3.Distance(segment.position, player.transform.position) < 0.7f)
             {
                 GameManager.GameOver();
@@ -237,6 +246,29 @@ public class Snake : MonoBehaviour
             Mathf.RoundToInt(head.position.x + newDirection.x * segmentSize),
             Mathf.RoundToInt(head.position.z + newDirection.z * segmentSize)
         );
+
+        // Проверяем, не занята ли целевая позиция другими змеями
+        Snake[] allSnakes = FindObjectsOfType<Snake>();
+        foreach (Snake snake in allSnakes)
+        {
+            for (int i = 0; i < snake.transform.childCount; i++)
+            {
+                Transform segment = snake.transform.GetChild(i);
+                Vector2Int segmentPos = new Vector2Int(
+                    Mathf.RoundToInt(segment.position.x),
+                    Mathf.RoundToInt(segment.position.z)
+                );
+
+                // Пропускаем проверку головы текущей змеи
+                if (snake == this && i == 0) continue;
+
+                if (newPos == segmentPos)
+                {
+                    isMoving = false;
+                    return;
+                }
+            }
+        }
 
         if (!pathFinder.IsWalkable(newPos))
         {

@@ -1,4 +1,3 @@
-using Unity.Android.Gradle;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour
@@ -8,9 +7,11 @@ public class LevelManager : MonoBehaviour
     public GameObject[] Blocks;
     public GameObject PlayerPrefab;
     public GameObject BlueSnakePrefab;
+    public GameObject RedSnakePrefab; // Добавлен префаб для красной змеи
     public CameraController Camera;
 
     private GameObject _Player;
+
     public void LoadLevel()
     {
         if (CurrentLevel == null)
@@ -33,7 +34,11 @@ public class LevelManager : MonoBehaviour
         CreatePlayer();
         if (CurrentLevel.blueSnake.Length > 0)
         {
-            CreateBlueSnake();
+            CreateSnake(CurrentLevel.blueSnake, BlueSnakePrefab);
+        }
+        if (CurrentLevel.redSnake.Length > 0) // Добавлено создание красной змеи
+        {
+            CreateSnake(CurrentLevel.redSnake, RedSnakePrefab);
         }
     }
 
@@ -46,10 +51,9 @@ public class LevelManager : MonoBehaviour
         controller.cameraController = Camera;
     }
 
-    private void CreateBlueSnake()
+    private void CreateSnake(Vector2[] points2D, GameObject snakePrefab)
     {
-        var points2D = CurrentLevel.blueSnake;
-        var snake = Instantiate(BlueSnakePrefab, new Vector3(points2D[0].x, 0.73f, points2D[0].y), Quaternion.identity);
+        var snake = Instantiate(snakePrefab, new Vector3(points2D[0].x, 0.73f, points2D[0].y), Quaternion.identity);
         for (int i = 1; i < points2D.Length; i++)
         {
             GameObject emptyObject = new GameObject($"Segment{i}");
@@ -61,7 +65,6 @@ public class LevelManager : MonoBehaviour
         snakeController.GameManager = GameManager;
         snakeController.LevelManager = this;
         snakeController.InitSnake();
-
     }
 
     private void BuildLevel()
@@ -89,35 +92,20 @@ public class LevelManager : MonoBehaviour
         switch (id)
         {
             case 0://Grass
-                {
-                    return Blocks[0];
-                }
+                return Blocks[0];
             case 2://Tree
-                {
-                    return Blocks[1];
-                }
+                return Blocks[1];
             case 3://Star
-                {
-                    return Blocks[2];
-                }
+                return Blocks[2];
             case 4://Finish
-                {
-                    return Blocks[3];
-                }
+                return Blocks[3];
             case 5://Bushes
-                {
-                    return Blocks[4];
-                }
+                return Blocks[4];
             case 6://Fir Trees
-                {
-                    return Blocks[5];
-                }
+                return Blocks[5];
             case 7://ICE
-                {
-                    return Blocks[6];
-                }
+                return Blocks[6];
         }
-
         return Blocks[0];
     }
 }

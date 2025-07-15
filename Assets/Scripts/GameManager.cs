@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,6 +12,7 @@ public class GameManager : MonoBehaviour
     public GameUI UI;
     public int StarsCount = 0;
     public GameObject[] Stars;
+    private Action moveCompleteAction;
     public void Start()
     {
         StarsCount = 0;
@@ -19,7 +22,8 @@ public class GameManager : MonoBehaviour
 
         if (playerController != null)
         {
-            playerController.OnMoveComplete += OnPlayerMoveComplete;
+            moveCompleteAction = () => StartCoroutine(OnPlayerMoveComplete());
+            playerController.OnMoveComplete += moveCompleteAction;
         }
     }
 
@@ -31,35 +35,36 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void OnPlayerMoveComplete()
+    private IEnumerator OnPlayerMoveComplete()
     {
-        // Ход игрока завершен, теперь ход змейки
         isPlayerTurn = false;
 
-        // Получаем текущую позицию игрока
         Vector2Int playerPosition = new Vector2Int(
             Mathf.RoundToInt(playerController.transform.position.x),
             Mathf.RoundToInt(playerController.transform.position.z)
         );
 
-        if (snake != null)
+        Snake[] snakes = FindObjectsOfType<Snake>();
+        foreach (Snake snake in snakes)
         {
-            // Двигаем змейку
             snake.MakeMove(playerPosition);
-
-            // Немедленная проверка столкновения после хода змейки
             snake.CheckPlayerCollision();
+
+            while (snake.IsMoving())
+            {
+                yield return null;
+            }
         }
 
-        // Возвращаем ход игроку
         isPlayerTurn = true;
     }
+
 
     private void OnDestroy()
     {
         if (playerController != null)
         {
-            playerController.OnMoveComplete -= OnPlayerMoveComplete;
+            playerController.OnMoveComplete -= moveCompleteAction;
         }
     }
 
