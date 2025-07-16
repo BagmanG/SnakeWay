@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public int StarsCount = 0;
     public GameObject[] Stars;
     private Action moveCompleteAction;
+    bool completed = false;
     public void Start()
     {
         StarsCount = 0;
@@ -70,7 +71,8 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        UI.ShowGameOver();
+        if (completed == false)
+            UI.ShowGameOver();
     }
 
     public void TryAgain()
@@ -90,6 +92,7 @@ public class GameManager : MonoBehaviour
     public void LevelCompleted()
     {
         Debug.Log("Level Completed!");
+        completed = true;
     }
 
     public void PauseGame()
