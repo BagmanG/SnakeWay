@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 373d920eece5e8c44919724351e9fae1
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 302343
+  packageName: Plugin Your Games 2.0
+  packageVersion: 2.0032
+  assetPath: Assets/PluginYourGames/Platforms/YandexGames/Scripts/Editor/TestLabel/TestLabel.js
+  uploadId: 726355
