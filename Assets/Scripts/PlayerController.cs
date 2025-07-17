@@ -74,20 +74,23 @@ public class PlayerController : MonoBehaviour
         isPerformingAction = true;
         canMove = false;
         currentMoveDirection = direction;
-        animator.SetTrigger("Jump");
 
         Vector3 newPosition = transform.position + direction;
         Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(newPosition.x), Mathf.RoundToInt(newPosition.z));
 
         if (IsPositionValid(gridPos))
         {
+            animator.SetTrigger("Jump");
             targetRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
             targetPosition = newPosition;
             isMoving = true;
         }
         else
         {
-            CompletePlayerAction();
+            // Если движение невозможно, сразу разрешаем новое движение без вызова CompletePlayerAction
+            isPerformingAction = false;
+            canMove = true;
+            animator.ResetTrigger("Jump"); // Сбрасываем анимацию прыжка, если движение не состоялось
         }
     }
 
