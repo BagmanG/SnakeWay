@@ -133,12 +133,12 @@ public class PathFinder
     private List<Vector2Int> GetNeighbors(Vector2Int position)
     {
         return new List<Vector2Int>
-        {
-            new Vector2Int(position.x + 1, position.y),
-            new Vector2Int(position.x - 1, position.y),
-            new Vector2Int(position.x, position.y + 1),
-            new Vector2Int(position.x, position.y - 1)
-        };
+    {
+        new Vector2Int(position.x, position.y + 1),    // Вверх
+        new Vector2Int(position.x + 1, position.y),    // Вправо
+        new Vector2Int(position.x, position.y - 1),    // Вниз
+        new Vector2Int(position.x - 1, position.y)     // Влево
+    };
     }
 
     private class Node
@@ -157,15 +157,21 @@ public class PathFinder
     {
         private List<Node> elements = new List<Node>();
 
-        public int Count
-        {
-            get { return elements.Count; }
-        }
+        public int Count => elements.Count;
 
         public void Enqueue(Node item)
         {
             elements.Add(item);
-            elements.Sort((a, b) => a.Priority.CompareTo(b.Priority));
+            // Сортировка по приоритету, затем по координатам
+            elements.Sort((a, b) =>
+            {
+                int priorityCompare = a.Priority.CompareTo(b.Priority);
+                if (priorityCompare != 0) return priorityCompare;
+
+                // При одинаковом приоритете сортируем по X и Y
+                int xCompare = a.Position.x.CompareTo(b.Position.x);
+                return xCompare != 0 ? xCompare : a.Position.y.CompareTo(b.Position.y);
+            });
         }
 
         public Node Dequeue()
@@ -177,12 +183,7 @@ public class PathFinder
 
         public bool Contains(Vector2Int position)
         {
-            foreach (var node in elements)
-            {
-                if (node.Position == position)
-                    return true;
-            }
-            return false;
+            return elements.Any(node => node.Position == position);
         }
     }
 }
