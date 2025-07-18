@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class Snake : MonoBehaviour
@@ -34,6 +35,10 @@ public class Snake : MonoBehaviour
     private List<Vector3> segmentVelocities;
     public GameManager GameManager;
     public LevelManager LevelManager;
+
+    private Vector2Int plannedNextCell;
+    private List<Vector2Int> plannedBodyPositions = new List<Vector2Int>();
+
     public bool IsMoving()
     {
         return isMoving;
@@ -43,6 +48,84 @@ public class Snake : MonoBehaviour
     private List<Vector2Int> currentPath;
     private int currentPathIndex;
     private Vector2Int lastPlayerPosition;
+
+    public Vector2Int PeekNextMove(Vector2Int playerPosition, List<Vector2Int> dynamicObstacles)
+    {
+        Vector2Int snakeHeadPos = new Vector2Int(
+            Mathf.RoundToInt(head.position.x),
+            Mathf.RoundToInt(head.position.z)
+        );
+
+        // Ищем путь к игроку, учитывая все занятые клетки
+        currentPath = pathFinder.FindPath(snakeHeadPos, playerPosition, dynamicObstacles);
+
+        if (currentPath != null && currentPath.Count > 0)
+        {
+            plannedNextCell = currentPath[0];
+            return plannedNextCell;
+        }
+
+        plannedNextCell = snakeHeadPos;
+        return snakeHeadPos; // Остаемся на месте если нет пути
+    }
+
+    public List<Vector2Int> GetPlannedBodyPositions()
+    {
+        plannedBodyPositions.Clear();
+
+        // Голова перемещается в plannedNextCell
+        plannedBodyPositions.Add(plannedNextCell);
+
+        // Тело перемещается в предыдущие позиции
+        for (int i = 0; i < bodySegments.Count; i++)
+        {
+            Vector2Int prevPos;
+            if (i == 0)
+            {
+                prevPos = new Vector2Int(
+                    Mathf.RoundToInt(head.position.x),
+                    Mathf.RoundToInt(head.position.z)
+                );
+            }
+            else
+            {
+                prevPos = new Vector2Int(
+                    Mathf.RoundToInt(bodySegments[i - 1].position.x),
+                    Mathf.RoundToInt(bodySegments[i - 1].position.z)
+                );
+            }
+            plannedBodyPositions.Add(prevPos);
+        }
+
+        return plannedBodyPositions;
+    }
+
+    public IEnumerator Step()
+    {
+        if (plannedNextCell == new Vector2Int(
+            Mathf.RoundToInt(head.position.x),
+            Mathf.RoundToInt(head.position.z)))
+        {
+            yield break; // Никуда не двигаемся
+        }
+
+        isMoving = true;
+        Vector3 direction = new Vector3(
+            plannedNextCell.x - head.position.x,
+            0,
+            plannedNextCell.y - head.position.z
+        ).normalized;
+
+        ChangeDirection(direction);
+
+        while (isMoving)
+        {
+            yield return null;
+        }
+
+        CheckPlayerCollision();
+        CheckStarCollision();
+    }
 
     public void InitSnake()
     {
@@ -246,29 +329,6 @@ public class Snake : MonoBehaviour
             Mathf.RoundToInt(head.position.x + newDirection.x * segmentSize),
             Mathf.RoundToInt(head.position.z + newDirection.z * segmentSize)
         );
-
-        // Проверяем, не занята ли целевая позиция другими змеями
-        Snake[] allSnakes = FindObjectsOfType<Snake>();
-        foreach (Snake snake in allSnakes)
-        {
-            for (int i = 0; i < snake.transform.childCount; i++)
-            {
-                Transform segment = snake.transform.GetChild(i);
-                Vector2Int segmentPos = new Vector2Int(
-                    Mathf.RoundToInt(segment.position.x),
-                    Mathf.RoundToInt(segment.position.z)
-                );
-
-                // Пропускаем проверку головы текущей змеи
-                if (snake == this && i == 0) continue;
-
-                if (newPos == segmentPos)
-                {
-                    isMoving = false;
-                    return;
-                }
-            }
-        }
 
         if (!pathFinder.IsWalkable(newPos))
         {

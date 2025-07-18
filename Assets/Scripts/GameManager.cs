@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -45,15 +46,80 @@ public class GameManager : MonoBehaviour
             Mathf.RoundToInt(playerController.transform.position.z)
         );
 
+        // Получаем всех змей на сцене
         Snake[] snakes = FindObjectsOfType<Snake>();
+
+        // Список для хранения занятых клеток
+        HashSet<Vector2Int> occupiedCells = new HashSet<Vector2Int>();
+
+        // 1. Собираем текущие позиции всех сегментов всех змей
         foreach (Snake snake in snakes)
         {
-            snake.MakeMove(playerPosition);
-            snake.CheckPlayerCollision();
-
-            while (snake.IsMoving())
+            for (int i = 0; i < snake.transform.childCount; i++)
             {
-                yield return null;
+                Transform segment = snake.transform.GetChild(i);
+                Vector2Int pos = new Vector2Int(
+                    Mathf.RoundToInt(segment.position.x),
+                    Mathf.RoundToInt(segment.position.z)
+                );
+                occupiedCells.Add(pos);
+            }
+        }
+
+        // 2. Каждая змея планирует свой ход
+        Dictionary<Snake, Vector2Int> plannedMoves = new Dictionary<Snake, Vector2Int>();
+        Dictionary<Snake, List<Vector2Int>> plannedBodies = new Dictionary<Snake, List<Vector2Int>>();
+
+        foreach (Snake snake in snakes)
+        {
+            // Получаем планируемые позиции всех других змей
+            List<Vector2Int> dynamicObstacles = new List<Vector2Int>(occupiedCells);
+            foreach (var otherSnake in snakes)
+            {
+                if (otherSnake != snake)
+                {
+                    dynamicObstacles.AddRange(otherSnake.GetPlannedBodyPositions());
+                }
+            }
+
+            Vector2Int nextCell = snake.PeekNextMove(playerPosition, dynamicObstacles);
+            plannedMoves[snake] = nextCell;
+            plannedBodies[snake] = snake.GetPlannedBodyPositions();
+        }
+
+        // 3. Проверяем конфликты
+        HashSet<Vector2Int> conflictCells = new HashSet<Vector2Int>();
+        HashSet<Vector2Int> allPlannedMoves = new HashSet<Vector2Int>();
+
+        foreach (var move in plannedMoves.Values)
+        {
+            if (allPlannedMoves.Contains(move) || occupiedCells.Contains(move))
+            {
+                conflictCells.Add(move);
+            }
+            allPlannedMoves.Add(move);
+        }
+
+        // 4. Выполняем ходы только для змей без конфликтов
+        foreach (Snake snake in snakes)
+        {
+            Vector2Int plannedMove = plannedMoves[snake];
+
+            if (!conflictCells.Contains(plannedMove) &&
+                !occupiedCells.Contains(plannedMove))
+            {
+                yield return StartCoroutine(snake.Step());
+
+                // Обновляем занятые клетки после хода
+                for (int i = 0; i < snake.transform.childCount; i++)
+                {
+                    Transform segment = snake.transform.GetChild(i);
+                    Vector2Int pos = new Vector2Int(
+                        Mathf.RoundToInt(segment.position.x),
+                        Mathf.RoundToInt(segment.position.z)
+                    );
+                    occupiedCells.Add(pos);
+                }
             }
         }
 
