@@ -33,7 +33,7 @@ public class PathFinder
             position.y < 0 || position.y >= levelData.height)
             return false;
 
-        return walkableGrid[position.x, position.y] == 0;
+        return walkableGrid[position.x, position.y] == 0 || walkableGrid[position.x, position.y] == 3 || walkableGrid[position.x, position.y] == 4;
     }
 
     public List<Vector2Int> FindPath(Vector2Int start, Vector2Int target, List<Vector2Int> obstacles)

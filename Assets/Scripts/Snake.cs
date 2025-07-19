@@ -1,4 +1,4 @@
-using UnityEngine;
+п»їusing UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
@@ -43,7 +43,7 @@ public class Snake : MonoBehaviour
     {
         return isMoving;
     }
-    // Добавляем переменные для поиска пути
+    // Р”РѕР±Р°РІР»СЏРµРј РїРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ РїРѕРёСЃРєР° РїСѓС‚Рё
     private PathFinder pathFinder;
     private List<Vector2Int> currentPath;
     private int currentPathIndex;
@@ -56,7 +56,7 @@ public class Snake : MonoBehaviour
             Mathf.RoundToInt(head.position.z)
         );
 
-        // Ищем путь к игроку, учитывая все занятые клетки
+        // РС‰РµРј РїСѓС‚СЊ Рє РёРіСЂРѕРєСѓ, СѓС‡РёС‚С‹РІР°СЏ РІСЃРµ Р·Р°РЅСЏС‚С‹Рµ РєР»РµС‚РєРё
         currentPath = pathFinder.FindPath(snakeHeadPos, playerPosition, dynamicObstacles);
 
         if (currentPath != null && currentPath.Count > 0)
@@ -66,17 +66,17 @@ public class Snake : MonoBehaviour
         }
 
         plannedNextCell = snakeHeadPos;
-        return snakeHeadPos; // Остаемся на месте если нет пути
+        return snakeHeadPos; // РћСЃС‚Р°РµРјСЃСЏ РЅР° РјРµСЃС‚Рµ РµСЃР»Рё РЅРµС‚ РїСѓС‚Рё
     }
 
     public List<Vector2Int> GetPlannedBodyPositions()
     {
         plannedBodyPositions.Clear();
 
-        // Голова перемещается в plannedNextCell
+        // Р“РѕР»РѕРІР° РїРµСЂРµРјРµС‰Р°РµС‚СЃСЏ РІ plannedNextCell
         plannedBodyPositions.Add(plannedNextCell);
 
-        // Тело перемещается в предыдущие позиции
+        // РўРµР»Рѕ РїРµСЂРµРјРµС‰Р°РµС‚СЃСЏ РІ РїСЂРµРґС‹РґСѓС‰РёРµ РїРѕР·РёС†РёРё
         for (int i = 0; i < bodySegments.Count; i++)
         {
             Vector2Int prevPos;
@@ -106,7 +106,7 @@ public class Snake : MonoBehaviour
             Mathf.RoundToInt(head.position.x),
             Mathf.RoundToInt(head.position.z)))
         {
-            yield break; // Никуда не двигаемся
+            yield break; // РќРёРєСѓРґР° РЅРµ РґРІРёРіР°РµРјСЃСЏ
         }
 
         isMoving = true;
@@ -129,10 +129,10 @@ public class Snake : MonoBehaviour
 
     public void InitSnake()
     {
-        // Инициализация пути
+        // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСѓС‚Рё
         pathFinder = new PathFinder(LevelManager.CurrentLevel);
 
-        // Находим голову (первый дочерний объект)
+        // РќР°С…РѕРґРёРј РіРѕР»РѕРІСѓ (РїРµСЂРІС‹Р№ РґРѕС‡РµСЂРЅРёР№ РѕР±СЉРµРєС‚)
         if (transform.childCount == 0)
         {
             Debug.LogError("No child objects found for snake!");
@@ -142,7 +142,7 @@ public class Snake : MonoBehaviour
         head = transform.GetChild(0);
         head.name = "Head";
 
-        // Находим все сегменты (дочерние объекты с "Segment" в имени)
+        // РќР°С…РѕРґРёРј РІСЃРµ СЃРµРіРјРµРЅС‚С‹ (РґРѕС‡РµСЂРЅРёРµ РѕР±СЉРµРєС‚С‹ СЃ "Segment" РІ РёРјРµРЅРё)
         bodySegments = new List<Transform>();
         for (int i = 1; i < transform.childCount; i++)
         {
@@ -153,10 +153,10 @@ public class Snake : MonoBehaviour
             }
         }
 
-        // Сортируем сегменты по имени
+        // РЎРѕСЂС‚РёСЂСѓРµРј СЃРµРіРјРµРЅС‚С‹ РїРѕ РёРјРµРЅРё
         bodySegments = bodySegments.OrderBy(t => t.name).ToList();
 
-        // Автоматически определяем начальный поворот головы
+        // РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРё РѕРїСЂРµРґРµР»СЏРµРј РЅР°С‡Р°Р»СЊРЅС‹Р№ РїРѕРІРѕСЂРѕС‚ РіРѕР»РѕРІС‹
         if (bodySegments.Count > 0)
         {
             Vector3 directionToFirstSegment = (head.position-bodySegments[0].position).normalized;
@@ -168,14 +168,14 @@ public class Snake : MonoBehaviour
             }
         }
 
-        // Инициализируем скорости для плавного движения
+        // РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј СЃРєРѕСЂРѕСЃС‚Рё РґР»СЏ РїР»Р°РІРЅРѕРіРѕ РґРІРёР¶РµРЅРёСЏ
         segmentVelocities = new List<Vector3>();
         for (int i = 0; i < bodySegments.Count; i++)
         {
             segmentVelocities.Add(Vector3.zero);
         }
 
-        // Вычисляем радиусы для каждого сегмента
+        // Р’С‹С‡РёСЃР»СЏРµРј СЂР°РґРёСѓСЃС‹ РґР»СЏ РєР°Р¶РґРѕРіРѕ СЃРµРіРјРµРЅС‚Р°
         CalculateSegmentRadii();
 
         InitializePath();
@@ -235,7 +235,7 @@ public class Snake : MonoBehaviour
             Mathf.RoundToInt(head.position.z)
         );
 
-        // Получаем позиции всех сегментов всех змей (включая текущую)
+        // РџРѕР»СѓС‡Р°РµРј РїРѕР·РёС†РёРё РІСЃРµС… СЃРµРіРјРµРЅС‚РѕРІ РІСЃРµС… Р·РјРµР№ (РІРєР»СЋС‡Р°СЏ С‚РµРєСѓС‰СѓСЋ)
         List<Vector2Int> allSnakeSegments = new List<Vector2Int>();
         Snake[] allSnakes = FindObjectsOfType<Snake>();
         foreach (Snake snake in allSnakes)
@@ -248,14 +248,14 @@ public class Snake : MonoBehaviour
                     Mathf.RoundToInt(segment.position.z)
                 );
 
-                // Для текущей змеи добавляем только сегменты тела (не голову)
+                // Р”Р»СЏ С‚РµРєСѓС‰РµР№ Р·РјРµРё РґРѕР±Р°РІР»СЏРµРј С‚РѕР»СЊРєРѕ СЃРµРіРјРµРЅС‚С‹ С‚РµР»Р° (РЅРµ РіРѕР»РѕРІСѓ)
                 if (snake == this && i == 0) continue;
 
                 allSnakeSegments.Add(segmentPos);
             }
         }
 
-        // Ищем путь к игроку, учитывая все занятые клетки
+        // РС‰РµРј РїСѓС‚СЊ Рє РёРіСЂРѕРєСѓ, СѓС‡РёС‚С‹РІР°СЏ РІСЃРµ Р·Р°РЅСЏС‚С‹Рµ РєР»РµС‚РєРё
         currentPath = pathFinder.FindPath(snakeHeadPos, playerPosition, allSnakeSegments);
         currentPathIndex = 0;
 
@@ -268,23 +268,24 @@ public class Snake : MonoBehaviour
         else
         {
             isMoving = false;
-            Debug.Log("Нет возможного пути, змея остается на месте");
+            Debug.Log("РќРµС‚ РІРѕР·РјРѕР¶РЅРѕРіРѕ РїСѓС‚Рё, Р·РјРµСЏ РѕСЃС‚Р°РµС‚СЃСЏ РЅР° РјРµСЃС‚Рµ");
         }
     }
 
     public void CheckPlayerCollision()
     {
+        if (GameManager == null || GameManager.IsLevelCompleted())
+            return; // рџљ« РЈСЂРѕРІРµРЅСЊ Р·Р°РІРµСЂС€С‘РЅ вЂ” РЅРµ РїСЂРѕРІРµСЂСЏРµРј
+
         PlayerController player = FindObjectOfType<PlayerController>();
         if (player == null) return;
 
-        // Проверяем столкновение головы с игроком
         if (Vector3.Distance(head.position, player.transform.position) < 0.7f)
         {
             GameManager.GameOver();
             return;
         }
 
-        // Проверяем столкновение тела с игроком
         for (int i = 1; i < transform.childCount; i++)
         {
             Transform segment = transform.GetChild(i);
@@ -296,9 +297,10 @@ public class Snake : MonoBehaviour
         }
     }
 
+
     private void CheckStarCollision()
     {
-        // Получаем все объекты со StarGiver на сцене
+        // РџРѕР»СѓС‡Р°РµРј РІСЃРµ РѕР±СЉРµРєС‚С‹ СЃРѕ StarGiver РЅР° СЃС†РµРЅРµ
         StarGiver[] stars = FindObjectsOfType<StarGiver>();
         if (stars == null || stars.Length == 0) return;
 
@@ -362,7 +364,7 @@ public class Snake : MonoBehaviour
         if (Vector3.Distance(head.localPosition, targetPosition) < 0.01f)
         {
             isMoving = false;
-            CheckStarCollision(); // Добавляем проверку звезды
+            CheckStarCollision(); // Р”РѕР±Р°РІР»СЏРµРј РїСЂРѕРІРµСЂРєСѓ Р·РІРµР·РґС‹
             CheckPlayerCollision();
         }
     }

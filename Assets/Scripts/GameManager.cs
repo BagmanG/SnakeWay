@@ -171,4 +171,10 @@ public class GameManager : MonoBehaviour
     {
         UI.SetPauseVisible(!UI.PauseVisible);
     }
+
+    public bool IsLevelCompleted()
+    {
+        return completed;
+    }
+
 }

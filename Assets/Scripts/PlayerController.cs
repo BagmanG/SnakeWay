@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
         {
             transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-
+            CheckTileAfterMovement();
             CheckSnakeCollision();
 
             if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
