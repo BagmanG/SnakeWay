@@ -2291,7 +2291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67fb6d609eb21844cbae245613a09764, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableLogging: 1
+  enableLogging: 0
 --- !u!4 &1412770183
 Transform:
   m_ObjectHideFlags: 0
