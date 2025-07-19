@@ -178,8 +178,12 @@ public class GameManager : MonoBehaviour
 
     public void LevelCompleted()
     {
-        Debugger.Instance?.Log("=== LEVEL COMPLETED ===");
-        completed = true;
+        if (completed == false)
+        {
+            Debugger.Instance?.Log("=== LEVEL COMPLETED ===");
+            Debug.Log("LEVEL COMPLTETED");
+            completed = true;
+        }
     }
 
     public void PauseGame()
