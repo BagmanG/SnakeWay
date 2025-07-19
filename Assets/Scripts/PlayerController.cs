@@ -98,7 +98,7 @@ public class PlayerController : MonoBehaviour
     {
         isPerformingAction = false;
         OnMoveComplete?.Invoke();
-        StartCoroutine(EnableMovementAfterDelay(0.2f));
+        StartCoroutine(EnableMovementAfterDelay(0.3f));
     }
 
     private IEnumerator EnableMovementAfterDelay(float delay)

@@ -51,7 +51,7 @@ MonoBehaviour:
   headRadius: 0.2
   tailRadius: 0.1
   cornerSmoothing: 0.5
-  moveSpeed: 5
+  moveSpeed: 7
   rotationLerpSpeed: 10
   followSmoothness: 10
   snakeMaterial: {fileID: 2100000, guid: 09d0234f8084bc84aaa7f449adee7133, type: 2}
