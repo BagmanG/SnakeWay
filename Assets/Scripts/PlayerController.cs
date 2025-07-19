@@ -42,9 +42,10 @@ public class PlayerController : MonoBehaviour
                 transform.rotation = targetRotation;
                 isMoving = false;
 
+                CheckTileAfterMovement();
                 CheckSnakeCollision();
                 CheckStarCollision();
-                CheckTileAfterMovement();
+                
 
                 // Проверяем, нужно ли продолжать скольжение
                 if (IsOnIce() && ShouldContinueSlide(currentMoveDirection))
