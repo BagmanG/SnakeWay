@@ -93,6 +93,8 @@ public class PlayerController : MonoBehaviour
             canMove = true;
             animator.ResetTrigger("Jump"); // —брасываем анимацию прыжка, если движение не состо€лось
         }
+        Debugger.Instance?.Log($"Player attempts move to {gridPos}");
+
     }
 
     private void CompletePlayerAction()

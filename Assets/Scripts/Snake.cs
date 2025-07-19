@@ -56,7 +56,6 @@ public class Snake : MonoBehaviour
             Mathf.RoundToInt(head.position.z)
         );
 
-        // Ищем путь к игроку, учитывая все занятые клетки
         currentPath = pathFinder.FindPath(snakeHeadPos, playerPosition, dynamicObstacles);
 
         if (currentPath != null && currentPath.Count > 0)
@@ -65,9 +64,30 @@ public class Snake : MonoBehaviour
             return plannedNextCell;
         }
 
+        // 🚨 Резервный план: пробуем сделать шаг в любую сторону
+        List<Vector2Int> directions = new List<Vector2Int>
+    {
+        new Vector2Int(0, 1),  // вверх
+        new Vector2Int(1, 0),  // вправо
+        new Vector2Int(0, -1), // вниз
+        new Vector2Int(-1, 0), // влево
+    };
+
+        foreach (var dir in directions)
+        {
+            Vector2Int candidate = snakeHeadPos + dir;
+            if (pathFinder.IsWalkable(candidate) && !dynamicObstacles.Contains(candidate))
+            {
+                plannedNextCell = candidate;
+                return plannedNextCell;
+            }
+        }
+
+        // ❌ Если уж вообще некуда — остаёмся на месте
         plannedNextCell = snakeHeadPos;
-        return snakeHeadPos; // Остаемся на месте если нет пути
+        return snakeHeadPos;
     }
+
 
     public List<Vector2Int> GetPlannedBodyPositions()
     {
@@ -106,6 +126,7 @@ public class Snake : MonoBehaviour
             Mathf.RoundToInt(head.position.x),
             Mathf.RoundToInt(head.position.z)))
         {
+            Debugger.Instance?.Log($"[{name}] Skipped move (already at {plannedNextCell})");
             yield break; // Никуда не двигаемся
         }
 
@@ -125,6 +146,8 @@ public class Snake : MonoBehaviour
 
         CheckPlayerCollision();
         CheckStarCollision();
+        Debugger.Instance?.Log($"[{name}] Executing step to {plannedNextCell}");
+
     }
 
     public void InitSnake()
