@@ -38,7 +38,7 @@ public class Snake : MonoBehaviour
 
     private Vector2Int plannedNextCell;
     private List<Vector2Int> plannedBodyPositions = new List<Vector2Int>();
-
+    private Vector2Int currentDirection = Vector2Int.right;
     public bool IsMoving()
     {
         return isMoving;
@@ -60,33 +60,51 @@ public class Snake : MonoBehaviour
 
         if (currentPath != null && currentPath.Count > 0)
         {
-            plannedNextCell = currentPath[0];
-            return plannedNextCell;
-        }
+            Vector2Int next = currentPath[0];
+            Vector2Int moveDir = next - snakeHeadPos;
 
-        // 🚨 Резервный план: пробуем сделать шаг в любую сторону
-        List<Vector2Int> directions = new List<Vector2Int>
-    {
-        new Vector2Int(0, 1),  // вверх
-        new Vector2Int(1, 0),  // вправо
-        new Vector2Int(0, -1), // вниз
-        new Vector2Int(-1, 0), // влево
-    };
-
-        foreach (var dir in directions)
-        {
-            Vector2Int candidate = snakeHeadPos + dir;
-            if (pathFinder.IsWalkable(candidate) && !dynamicObstacles.Contains(candidate))
+            // ❌ запрет на разворот (противоположное направление)
+            if (moveDir == -currentDirection)
             {
-                plannedNextCell = candidate;
+                Debugger.Instance?.Log($"{name}: attempted reverse direction {moveDir}, blocked");
+            }
+            else
+            {
+                plannedNextCell = next;
+                currentDirection = moveDir; // ✅ обновляем направление
                 return plannedNextCell;
             }
         }
 
-        // ❌ Если уж вообще некуда — остаёмся на месте
+        // Резерв — любое направление кроме разворота
+        List<Vector2Int> directions = new List<Vector2Int>
+    {
+        new Vector2Int(0, 1),
+        new Vector2Int(1, 0),
+        new Vector2Int(0, -1),
+        new Vector2Int(-1, 0)
+    };
+
+        foreach (var dir in directions)
+        {
+            if (dir == -currentDirection) continue; // запрещаем разворот
+
+            Vector2Int candidate = snakeHeadPos + dir;
+            if (pathFinder.IsWalkable(candidate) && !dynamicObstacles.Contains(candidate))
+            {
+                plannedNextCell = candidate;
+                currentDirection = dir;
+                return plannedNextCell;
+            }
+        }
+
+        // Никуда не идём
         plannedNextCell = snakeHeadPos;
-        return snakeHeadPos;
+        return plannedNextCell;
     }
+
+
+
 
 
     public List<Vector2Int> GetPlannedBodyPositions()
@@ -188,6 +206,10 @@ public class Snake : MonoBehaviour
                 head.rotation = Quaternion.LookRotation(directionToFirstSegment);
                 lastGoodDirection = directionToFirstSegment;
                 moveDirection = directionToFirstSegment;
+
+                Vector2Int headPos = new Vector2Int(Mathf.RoundToInt(head.position.x), Mathf.RoundToInt(head.position.z));
+                Vector2Int segmentPos = new Vector2Int(Mathf.RoundToInt(bodySegments[0].position.x), Mathf.RoundToInt(bodySegments[0].position.z));
+                currentDirection = headPos - segmentPos;
             }
         }
 
