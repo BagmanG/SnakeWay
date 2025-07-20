@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
         LevelManager.LoadLevel();
         playerController = FindObjectOfType<PlayerController>();
         snake = FindObjectOfType<Snake>();
-
+        Application.targetFrameRate = 60;
         if (playerController != null)
         {
             moveCompleteAction = () => StartCoroutine(OnPlayerMoveComplete());
@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
             Debugger.Instance?.Log("Grid Row " + y + ": " + row);
         }
         LoadLevelIndex();
+        UI.Init();
     }
 
     private void LoadLevelIndex()

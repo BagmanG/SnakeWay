@@ -1,4 +1,5 @@
 using UnityEngine;
+using YG;
 
 public class CameraController : MonoBehaviour
 {
@@ -7,21 +8,32 @@ public class CameraController : MonoBehaviour
     public float minDistance = 2.0f; // Минимальное расстояние
     public float maxDistance = 15.0f; // Максимальное расстояние
 
-    public float xSpeed = 120.0f; // Скорость вращения по X
-    public float ySpeed = 120.0f; // Скорость вращения по Y
+    [Header("Rotation Settings")]
+    public float xSpeed = 120.0f; // Скорость вращения по X (для компьютера)
+    public float ySpeed = 120.0f; // Скорость вращения по Y (для компьютера)
 
+    [Space]
+    public float mobileXSpeed = 60.0f; // Скорость вращения по X (для мобильных)
+    public float mobileYSpeed = 60.0f; // Скорость вращения по Y (для мобильных)
+
+    [Header("Zoom Settings")]
+    public float zoomSpeed = 5f; // Скорость зума колесиком мыши
+
+    [Header("Angle Limits")]
     public float yMinLimit = -20f; // Ограничение угла по Y (вниз)
     public float yMaxLimit = 80f;  // Ограничение угла по Y (вверх)
 
-    public float zoomSpeed = 10f; // Скорость зума
+    [Header("Smoothing")]
     public float zoomSmoothing = 5f; // Сглаживание зума
-
     public float rotationSmoothing = 8f; // Сглаживание вращения
 
     private float x = 0.0f; // Текущий угол X
     private float y = 0.0f; // Текущий угол Y
     private float currentDistance; // Текущее расстояние
     private float desiredDistance; // Желаемое расстояние
+
+    private Vector2? lastMousePosition; // Для отслеживания предыдущей позиции мыши/тача
+    private int? touchId; // Для отслеживания конкретного тача
 
     void Start()
     {
@@ -48,22 +60,8 @@ public class CameraController : MonoBehaviour
     {
         if (target)
         {
-            // Вращение камеры при зажатой правой кнопке мыши
-            if (Input.GetMouseButton(0))
-            {
-                x += Input.GetAxis("Mouse X") * xSpeed * 0.02f;
-                y -= Input.GetAxis("Mouse Y") * ySpeed * 0.02f;
-
-                // Ограничиваем угол по Y
-                y = ClampAngle(y, yMinLimit, yMaxLimit);
-            }
-
-            // Обработка зума колесиком мыши
-            float scroll = Input.GetAxis("Mouse ScrollWheel");
-            if (scroll != 0.0f)
-            {
-                desiredDistance = Mathf.Clamp(desiredDistance - scroll * zoomSpeed, minDistance, maxDistance);
-            }
+            HandleRotationInput();
+            HandleZoomInput();
 
             // Плавное изменение расстояния
             currentDistance = Mathf.Lerp(currentDistance, desiredDistance, Time.deltaTime * zoomSmoothing);
@@ -76,6 +74,87 @@ public class CameraController : MonoBehaviour
             transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * rotationSmoothing);
             transform.position = Vector3.Lerp(transform.position, position, Time.deltaTime * rotationSmoothing);
         }
+    }
+
+    private void HandleRotationInput()
+    {
+        // Обработка ввода для компьютера (мышь)
+        if (YG2.envir.isDesktop)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                lastMousePosition = Input.mousePosition;
+            }
+            else if (Input.GetMouseButton(0))
+            {
+                if (lastMousePosition.HasValue)
+                {
+                    Vector2 delta = (Vector2)Input.mousePosition - lastMousePosition.Value;
+                    x += delta.x * xSpeed * 0.02f;
+                    y -= delta.y * ySpeed * 0.02f;
+                    y = ClampAngle(y, yMinLimit, yMaxLimit);
+                }
+                lastMousePosition = Input.mousePosition;
+            }
+            else if (Input.GetMouseButtonUp(0))
+            {
+                lastMousePosition = null;
+            }
+        }
+        // Обработка ввода для мобильных устройств (тач)
+        else
+        {
+            if (Input.touchCount == 1)
+            {
+                Touch touch = Input.GetTouch(0);
+
+                if (touch.phase == TouchPhase.Began)
+                {
+                    touchId = touch.fingerId;
+                    lastMousePosition = touch.position;
+                }
+                else if (touch.phase == TouchPhase.Moved && touchId == touch.fingerId)
+                {
+                    if (lastMousePosition.HasValue)
+                    {
+                        Vector2 delta = touch.position - lastMousePosition.Value;
+                        // Используем меньшую скорость для мобильных устройств
+                        x += delta.x * mobileXSpeed * 0.02f;
+                        y -= delta.y * mobileYSpeed * 0.02f;
+                        y = ClampAngle(y, yMinLimit, yMaxLimit);
+                    }
+                    lastMousePosition = touch.position;
+                }
+                else if (touch.phase == TouchPhase.Ended && touchId == touch.fingerId)
+                {
+                    touchId = null;
+                    lastMousePosition = null;
+                }
+            }
+        }
+    }
+
+    private void HandleZoomInput()
+    {
+        if (YG2.envir.isDesktop)
+        {
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            if (scroll != 0)
+            {
+                desiredDistance = Mathf.Clamp(desiredDistance - scroll * zoomSpeed, minDistance, maxDistance);
+            }
+        }
+    }
+
+    // Публичные методы для изменения дистанции
+    public void ZoomIn()
+    {
+        desiredDistance = Mathf.Clamp(desiredDistance - 1f, minDistance, maxDistance);
+    }
+
+    public void ZoomOut()
+    {
+        desiredDistance = Mathf.Clamp(desiredDistance + 1f, minDistance, maxDistance);
     }
 
     // Метод для ограничения угла

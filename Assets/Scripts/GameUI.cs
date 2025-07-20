@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using YG;
 
 public class GameUI : MonoBehaviour
 {
@@ -18,9 +19,10 @@ public class GameUI : MonoBehaviour
 
 
     private int levelIndex = 0;
-    private void Start()
+    public void Init()
     {
         levelIndex = GameManager.LevelIndex;
+        InitForPlatform();
     }
 
     public void ShowGameOver()
@@ -48,5 +50,15 @@ public class GameUI : MonoBehaviour
         {
             gameOverStars[i].sprite = i <= stars -1 ? givedStar : unGivedStar;
         }
+    }
+
+    private void InitForPlatform()
+    {
+        bool isDesktop = YG2.envir.isDesktop;
+        if (isDesktop)
+        {
+
+        }
+        Debug.Log($"Desktop? {isDesktop}");
     }
 }
