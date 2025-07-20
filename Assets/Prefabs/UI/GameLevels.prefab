@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5021955312406049783
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1487632027324391212}
+  - component: {fileID: 4062041114421071528}
+  m_Layer: 0
+  m_Name: GameLevels
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 1
+--- !u!4 &1487632027324391212
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5021955312406049783}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 149.00096, y: 413.86288, z: -1.3059013}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4062041114421071528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5021955312406049783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37b038456d15cc442971e2f11d3d2534, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ForestLevels:
+  - {fileID: 11400000, guid: 756e9b9b1527d50409d52e98db980ee4, type: 2}
+  - {fileID: 11400000, guid: 4d7bfa2225bf452499dc81af33c142cc, type: 2}
+  - {fileID: 11400000, guid: 3783fca990e979f46b32c20bb984c312, type: 2}
+  - {fileID: 11400000, guid: 794a2d098e3b52648aab517867f7735b, type: 2}
+  - {fileID: 11400000, guid: e2d4c0ae1e7654644a09d094b1523758, type: 2}
+  - {fileID: 11400000, guid: 1d20883b749d13f49b605bb92c150456, type: 2}
+  - {fileID: 11400000, guid: 461b297240604904b98c1c3becb7d057, type: 2}
+  - {fileID: 11400000, guid: e0caa341a65b4b041ab30fe1899b2b44, type: 2}
+  - {fileID: 11400000, guid: e78704fd173e8b04999275b8b4106cbe, type: 2}
+  - {fileID: 11400000, guid: a004678eab191444babe0bc466df7cc9, type: 2}
+  WinterLevels:
+  - {fileID: 11400000, guid: 67c8f09d04021c54da27304a25715e53, type: 2}
+  - {fileID: 11400000, guid: 506487dbe86008e418411f7505a3f2be, type: 2}
+  - {fileID: 11400000, guid: 2f6f4d8ed5592a1499ae3e076e678960, type: 2}
+  - {fileID: 11400000, guid: 05352e5f73f0aba4ebb35f02a055370e, type: 2}
+  - {fileID: 11400000, guid: 6652c9d53bba7f04a86f858935f5a6b8, type: 2}
+  - {fileID: 11400000, guid: bbc05ba081636164aac7aa8d58abeed2, type: 2}
+  - {fileID: 11400000, guid: 0c197fc4767147a459f94555e452a52c, type: 2}
+  - {fileID: 11400000, guid: 3be6df9f5db52db4395f3b1d53e9ddf5, type: 2}
+  - {fileID: 11400000, guid: b9a9f6618a103e946b37d5b13d84e68d, type: 2}
+  - {fileID: 11400000, guid: 4a964734d1f9114489758f6154eb9e6b, type: 2}

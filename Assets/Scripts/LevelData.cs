@@ -29,4 +29,17 @@ public class LevelData : ScriptableObject
             }
         }
     }
+
+    public Biome GetBiome()
+    {
+        if (name.Contains("Forest"))
+        {
+            return Biome.Forest;
+        }
+        if (name.Contains("Winter"))
+        {
+            return Biome.Winter;
+        }
+        return Biome.Forest;
+    }
 }
