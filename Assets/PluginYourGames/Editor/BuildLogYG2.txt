@@ -1,0 +1,3 @@
+Build path: C:/Users/persi/Downloads/TestBuild
+Build number: 1
+PluginYG version: 2.0041

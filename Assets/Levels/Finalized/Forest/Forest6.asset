@@ -21,3 +21,4 @@ MonoBehaviour:
   - {x: 2, y: 4}
   - {x: 2, y: 3}
   redSnake: []
+  skybox: 2

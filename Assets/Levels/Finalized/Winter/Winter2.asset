@@ -32,3 +32,4 @@ MonoBehaviour:
   - {x: 6, y: 6}
   - {x: 7, y: 6}
   - {x: 7, y: 5}
+  skybox: 1

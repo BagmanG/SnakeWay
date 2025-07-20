@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 3
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: 4ceae75df8658b34b9fa75bd4e761806, type: 2}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 2bd8959f5fbd3644aa33af1a155fc147, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -6229,7 +6229,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GameManager: {fileID: 461841813}
-  CurrentLevel: {fileID: 11400000, guid: e2d4c0ae1e7654644a09d094b1523758, type: 2}
+  CurrentLevel: {fileID: 11400000, guid: 3783fca990e979f46b32c20bb984c312, type: 2}
   Blocks:
   - {fileID: 8138566737248680225, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
   - {fileID: 8138566737248680225, guid: 191e7cf7a86b992489ff1ba665e861d0, type: 3}
@@ -6293,6 +6293,10 @@ MonoBehaviour:
   WinterColor: {r: 1, g: 1, b: 1, a: 0}
   Material: {fileID: 2100000, guid: 2c8ac31ddc42ac343a60fc4a9afb87e9, type: 2}
   SnowParticles: {fileID: 233106775}
+  Skyboxes:
+  - {fileID: 2100000, guid: 2bd8959f5fbd3644aa33af1a155fc147, type: 2}
+  - {fileID: 2100000, guid: f54e9b12592760b488fac0391d02d416, type: 2}
+  - {fileID: 2100000, guid: 4ceae75df8658b34b9fa75bd4e761806, type: 2}
 --- !u!1 &531320708
 GameObject:
   m_ObjectHideFlags: 0

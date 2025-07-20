@@ -22,7 +22,7 @@ public class LevelManager : MonoBehaviour
         BuildLevel();
         CreateEntities();
         InitCamera();
-        LevelDesigner.Init(CurrentLevel.name);
+        LevelDesigner.Init(CurrentLevel);
     }
 
     private void InitCamera()
