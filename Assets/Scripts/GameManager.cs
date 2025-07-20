@@ -15,10 +15,12 @@ public class GameManager : MonoBehaviour
     public GameObject[] Stars;
     private Action moveCompleteAction;
     bool completed = false;
-
+    public int Steps = 0;
+    public int LevelIndex = 0;
     public void Start()
     {
         StarsCount = 0;
+        Steps = 0;
         LevelManager.LoadLevel();
         playerController = FindObjectOfType<PlayerController>();
         snake = FindObjectOfType<Snake>();
@@ -41,6 +43,12 @@ public class GameManager : MonoBehaviour
             }
             Debugger.Instance?.Log("Grid Row " + y + ": " + row);
         }
+        LoadLevelIndex();
+    }
+
+    private void LoadLevelIndex()
+    {
+        LevelIndex = ExtractNumber(LevelManager.CurrentLevel.name);
     }
 
     private void Update()
@@ -143,6 +151,7 @@ public class GameManager : MonoBehaviour
         }
 
         isPlayerTurn = true;
+        Steps++;
     }
 
     private void OnDestroy()
@@ -189,6 +198,19 @@ public class GameManager : MonoBehaviour
     public void PauseGame()
     {
         UI.SetPauseVisible(!UI.PauseVisible);
+    }
+
+    public static int ExtractNumber(string text)
+    {
+        int number = 0;
+        for (int i = 0; i < text.Length; i++)
+        {
+            if (char.IsDigit(text[i]))
+            {
+                number = number * 10 + (text[i] - '0');
+            }
+        }
+        return number;
     }
 
     public bool IsLevelCompleted() => completed;
