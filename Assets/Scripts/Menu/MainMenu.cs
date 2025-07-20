@@ -57,7 +57,7 @@ public class MainMenu : MonoBehaviour
 
     private void SuccessPurchased(string id)
     {
-        if (id == "WinterBiome")
+        if (id == "WinterBiomePurchased")
         {
             YG2.SetState("WinterBiomePurchased",1);
         }
