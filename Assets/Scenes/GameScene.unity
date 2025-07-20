@@ -6784,6 +6784,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LevelManager: {fileID: 461841812}
+  playerController: {fileID: 0}
   UI: {fileID: 1248199292}
   StarsCount: 0
   Stars:
@@ -8595,6 +8596,7 @@ GameObject:
   - component: {fileID: 1248199289}
   - component: {fileID: 1248199288}
   - component: {fileID: 1248199292}
+  - component: {fileID: 1248199293}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -8715,6 +8717,24 @@ MonoBehaviour:
   - {fileID: 461322664}
   givedStar: {fileID: 21300000, guid: 715fa090595b5584abeecbf2852e85a7, type: 3}
   unGivedStar: {fileID: 21300000, guid: 05be048e88612c648a80f539ba37b238, type: 3}
+  MobileInputs: {fileID: 1687137676}
+  MobileInputController: {fileID: 1248199293}
+--- !u!114 &1248199293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1248199287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e060744f03134c747a02a1e48aab5323, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  upButton: {fileID: 294191911}
+  downButton: {fileID: 833784325}
+  leftButton: {fileID: 483489752}
+  rightButton: {fileID: 2063658558}
 --- !u!1 &1250483143
 GameObject:
   m_ObjectHideFlags: 0
@@ -10484,7 +10504,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1687137677
 RectTransform:
   m_ObjectHideFlags: 0
