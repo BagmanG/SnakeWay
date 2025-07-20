@@ -225,7 +225,18 @@ public class GameManager : MonoBehaviour
 
     public void SkipLevel()
     {
+        YG2.RewardedAdvShow("SkipLevel", () =>
+        {
+            ///Ставим 3 звезды на текущий уровень
+            YG2.SetState(LevelManager.CurrentLevel.name, 3);
+            ///TODO
+        });
+    }
 
+    private void SaveLevelInfo()
+    {
+        if(YG2.GetState(LevelManager.CurrentLevel.name) > StarsCount)
+            YG2.SetState(LevelManager.CurrentLevel.name,StarsCount);
     }
 
     public bool IsLevelCompleted() => completed;
