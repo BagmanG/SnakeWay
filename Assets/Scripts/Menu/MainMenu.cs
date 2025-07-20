@@ -27,7 +27,12 @@ public class MainMenu : MonoBehaviour
         for (int i = 0; i < levels.Length; i++)
         {
             LevelButton lb = Instantiate(LevelButtonPrefab,LevelsRoot).GetComponent<LevelButton>();
-            lb.Init(i+1,YG2.GetState($"{levelPresetName}{i+1}"));
+            lb.Init(i + 1, YG2.GetState($"{levelPresetName}{i + 1}"), levels[i]);
         }
+    }
+
+    private void LoadStarsCount()
+    {
+      
     }
 }

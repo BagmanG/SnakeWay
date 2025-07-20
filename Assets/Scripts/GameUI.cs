@@ -7,11 +7,14 @@ public class GameUI : MonoBehaviour
     [SerializeField] private GameManager GameManager;
 
     [SerializeField] private GameObject GameOverUI;
+    [SerializeField] private GameObject FinishUI;
     [SerializeField] private GameObject PauseUI;
 
     [SerializeField] private Text gameOverText;
+    [SerializeField] private Text finishText;
 
     [SerializeField] private Image[] gameOverStars;
+    [SerializeField] private Image[] finishStars;
     [SerializeField] private Sprite givedStar, unGivedStar;
 
     [SerializeField] private GameObject MobileInputs;
@@ -28,8 +31,14 @@ public class GameUI : MonoBehaviour
 
     public void ShowGameOver()
     {
-        PreInitGameOver();
+        PreInitUI();
         GameOverUI.SetActive(true);
+    }
+
+    public void ShowFinish()
+    {
+        PreInitUI();
+        FinishUI.SetActive(true);
     }
 
     public void SetPauseVisible(bool value)
@@ -37,10 +46,11 @@ public class GameUI : MonoBehaviour
         PauseUI.SetActive(value);
     }
 
-    private void PreInitGameOver()
+    private void PreInitUI()
     {
         LoadGameOverStars();
         gameOverText.text = $"Количетсво ходов: {GameManager.Steps + 1}\nУровень: {levelIndex}";
+        finishText.text = $"Количетсво ходов: {GameManager.Steps + 1}\nУровень: {levelIndex}";
     }
 
 
@@ -50,6 +60,7 @@ public class GameUI : MonoBehaviour
         for(int i = 0; i < 3; i++)
         {
             gameOverStars[i].sprite = i <= stars -1 ? givedStar : unGivedStar;
+            finishStars[i].sprite = i <= stars -1 ? givedStar : unGivedStar;
         }
     }
 

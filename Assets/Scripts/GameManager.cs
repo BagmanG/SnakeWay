@@ -1,3 +1,4 @@
+using Assets.Scripts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,8 +19,10 @@ public class GameManager : MonoBehaviour
     bool completed = false;
     public int Steps = 0;
     public int LevelIndex = 0;
+    public GameLevels GameLevels;
     public void Start()
     {
+        LevelManager.CurrentLevel = GlobalVars.currentBiome == Biome.Forest ? GameLevels.ForestLevels[GlobalVars.currentLevelID] : GameLevels.WinterLevels[GlobalVars.currentLevelID];
         StarsCount = 0;
         Steps = 0;
         LevelManager.LoadLevel();
@@ -50,7 +53,7 @@ public class GameManager : MonoBehaviour
 
     private void LoadLevelIndex()
     {
-        LevelIndex = ExtractNumber(LevelManager.CurrentLevel.name);
+        LevelIndex = GlobalVars.currentLevelID;
     }
 
     private void Update()
@@ -59,6 +62,11 @@ public class GameManager : MonoBehaviour
         #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.R)) { TryAgain(); return; }
         #endif
+    }
+
+    public void GoToMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 
     private IEnumerator OnPlayerMoveComplete()
@@ -197,6 +205,8 @@ public class GameManager : MonoBehaviour
             Debugger.Instance?.Log("=== LEVEL COMPLETED ===");
             Debug.Log("LEVEL COMPLTETED");
             completed = true;
+            UI.ShowFinish();
+            YG2.SetState(GlobalVars.levelName, StarsCount);
         }
     }
 
