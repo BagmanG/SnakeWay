@@ -498,6 +498,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
+      propertyPath: m_StitchLightmapSeams
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
       propertyPath: m_ReflectionProbeUsage
       value: 0
       objectReference: {fileID: 0}
@@ -708,6 +712,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
       propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
+      propertyPath: m_StitchLightmapSeams
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
@@ -1096,6 +1104,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
       propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
+      propertyPath: m_StitchLightmapSeams
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
@@ -5981,6 +5993,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
+      propertyPath: m_StitchLightmapSeams
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
       propertyPath: m_ReflectionProbeUsage
       value: 0
       objectReference: {fileID: 0}
@@ -6050,6 +6066,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
       propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
+      propertyPath: m_StitchLightmapSeams
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
@@ -6445,6 +6465,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
+      propertyPath: m_StitchLightmapSeams
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
       propertyPath: m_ReflectionProbeUsage
       value: 0
       objectReference: {fileID: 0}
@@ -6578,6 +6602,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
+      propertyPath: m_StitchLightmapSeams
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
       propertyPath: m_ReflectionProbeUsage
       value: 0
       objectReference: {fileID: 0}
@@ -6647,6 +6675,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
       propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
+      propertyPath: m_StitchLightmapSeams
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
@@ -7864,6 +7896,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
+      propertyPath: m_StitchLightmapSeams
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
       propertyPath: m_ReflectionProbeUsage
       value: 0
       objectReference: {fileID: 0}
@@ -8421,7 +8457,15 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
+      propertyPath: m_DynamicOccludee
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
       propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
+      propertyPath: m_StitchLightmapSeams
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
@@ -8494,6 +8538,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
       propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
+      propertyPath: m_StitchLightmapSeams
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
@@ -8929,6 +8977,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
+      propertyPath: m_StitchLightmapSeams
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 87db2e567bb0e1e4a97cf392ca374db0, type: 3}
       propertyPath: m_ReflectionProbeUsage
       value: 0
       objectReference: {fileID: 0}
@@ -8975,6 +9027,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
       propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
+      propertyPath: m_StitchLightmapSeams
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
@@ -9047,6 +9103,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
       propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
+      propertyPath: m_StitchLightmapSeams
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
@@ -9425,6 +9485,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
+      propertyPath: m_StitchLightmapSeams
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
       propertyPath: m_ReflectionProbeUsage
       value: 0
       objectReference: {fileID: 0}
@@ -9497,6 +9561,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
+      propertyPath: m_StitchLightmapSeams
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
       propertyPath: m_ReflectionProbeUsage
       value: 0
       objectReference: {fileID: 0}
@@ -9544,6 +9612,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
       propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
+      propertyPath: m_StitchLightmapSeams
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 306207225680275017, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
@@ -9616,6 +9688,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
       propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
+      propertyPath: m_StitchLightmapSeams
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7896730614279964169, guid: 917be0c97ab88984bbc7bfb9abf71dbc, type: 3}
