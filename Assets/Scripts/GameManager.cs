@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
         LevelManager.LoadLevel();
         playerController = FindObjectOfType<PlayerController>();
         snake = FindObjectOfType<Snake>();
-        Application.targetFrameRate = 90;
+        Application.targetFrameRate = 120;
         if (playerController != null)
         {
             moveCompleteAction = () => StartCoroutine(OnPlayerMoveComplete());
