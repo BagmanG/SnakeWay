@@ -200,6 +200,11 @@ public class GameManager : MonoBehaviour
         UI.SetPauseVisible(!UI.PauseVisible);
     }
 
+    public void UnPauseGame()
+    {
+        UI.SetPauseVisible(false);
+    }
+
     public static int ExtractNumber(string text)
     {
         int number = 0;
