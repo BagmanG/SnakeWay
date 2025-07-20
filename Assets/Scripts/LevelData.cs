@@ -1,5 +1,10 @@
 using UnityEngine;
 
+public enum LevelSkybox
+{
+    Default,Space,Sunset
+}
+
 [CreateAssetMenu(fileName = "LevelData", menuName = "Levels/Level Data")]
 public class LevelData : ScriptableObject
 {
@@ -11,6 +16,7 @@ public class LevelData : ScriptableObject
 
     public Vector2[] blueSnake;
     public Vector2[] redSnake;
+    public LevelSkybox skybox = LevelSkybox.Default;
 
     public void ConvertTo2D()
     {
