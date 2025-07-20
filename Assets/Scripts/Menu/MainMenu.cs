@@ -8,6 +8,18 @@ public class MainMenu : MonoBehaviour
 
     public GameObject SelectBiomeObject,SelectLevelObject;
     public GameLevels Levels;
+
+    private void Start()
+    {
+        ConsumePurchases();
+    }
+
+
+    private void ConsumePurchases()
+    {
+        YG2.ConsumePurchases();
+    }
+
     public void SelectBiome(int biomeID)
     {
         currentBiome = biomeID == 0 ? Biome.Forest : Biome.Winter;
@@ -31,8 +43,33 @@ public class MainMenu : MonoBehaviour
         }
     }
 
-    private void LoadStarsCount()
+    private void OnEnable()
     {
-      
+        YG2.onPurchaseSuccess += SuccessPurchased;
+        YG2.onPurchaseFailed += FailedPurchased;
+    }
+
+    private void OnDisable()
+    {
+        YG2.onPurchaseSuccess -= SuccessPurchased;
+        YG2.onPurchaseFailed -= FailedPurchased;
+    }
+
+    private void SuccessPurchased(string id)
+    {
+        if (id == "WinterBiome")
+        {
+            YG2.SetState("WinterBiomePurchased",1);
+        }
+    }
+
+    private void FailedPurchased(string id)
+    {
+        // Покупка не была совершена
+    }
+
+    public void BuyWinterBiome()
+    {
+        YG2.BuyPayments("WinterBiomePurchased");
     }
 }

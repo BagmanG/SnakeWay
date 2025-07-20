@@ -202,11 +202,11 @@ public class GameManager : MonoBehaviour
     {
         if (completed == false)
         {
+            SaveLevelInfo();
             Debugger.Instance?.Log("=== LEVEL COMPLETED ===");
             Debug.Log("LEVEL COMPLTETED");
             completed = true;
             UI.ShowFinish();
-            YG2.SetState(GlobalVars.levelName, StarsCount);
         }
     }
 
@@ -239,13 +239,37 @@ public class GameManager : MonoBehaviour
         {
             ///Ставим 3 звезды на текущий уровень
             YG2.SetState(LevelManager.CurrentLevel.name, 3);
+            GoNextLevel();
             ///TODO
         });
     }
 
+    public void GoNextLevel()
+    {
+        ///TODO
+        //Переход на след.биом
+        if (GlobalVars.currentLevelID == 9 && GlobalVars.currentBiome == Biome.Forest)
+        {
+            GlobalVars.currentLevelID = 0;
+            GlobalVars.levelName = $"Winter1";
+            GlobalVars.currentBiome = Biome.Winter;
+            SceneManager.LoadScene("GameScene");
+            return;
+        }
+        if (GlobalVars.currentLevelID == 9 && GlobalVars.currentBiome == Biome.Winter)
+        {
+            GoToMenu();
+            return;
+        }
+        GlobalVars.currentLevelID++;
+        string levelBiome = GlobalVars.currentBiome == Biome.Forest ? "Forest" : "Winter";
+        GlobalVars.levelName = $"{levelBiome}{GlobalVars.currentLevelID}";
+        SceneManager.LoadScene("GameScene");
+    }
+
     private void SaveLevelInfo()
     {
-        if(YG2.GetState(LevelManager.CurrentLevel.name) > StarsCount)
+        if(YG2.GetState(LevelManager.CurrentLevel.name) < StarsCount)
             YG2.SetState(LevelManager.CurrentLevel.name,StarsCount);
     }
 

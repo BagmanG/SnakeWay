@@ -335,32 +335,14 @@ MonoBehaviour:
     durationPayPanel: 1
     testBuyFail: 0
     purshases:
-    - id: gun
-      title: Gun
-      description: Product - Gun
-      imageURI: demo image
-      price: 5 YAN
-      priceValue: 5
-      priceCurrencyCode: YAN
-      currencyImageURL: https://yastatic.net/s3/games-static/static-data/images/payments/sdk/currency-icon-s@2x.png
-      consumed: 1
-    - id: armor
-      title: Armor
-      description: Product - Armor
-      imageURI: demo image
-      price: 10 YAN
-      priceValue: 10
-      priceCurrencyCode: YAN
-      currencyImageURL: https://yastatic.net/s3/games-static/static-data/images/payments/sdk/currency-icon-s@2x.png
-      consumed: 1
-    - id: grenade
-      title: Grenade
-      description: Product - Grenade
-      imageURI: demo image
-      price: 30 YAN
-      priceValue: 30
-      priceCurrencyCode: YAN
-      currencyImageURL: https://yastatic.net/s3/games-static/static-data/images/payments/sdk/currency-icon-s@2x.png
+    - id: WinterBiomePurchased
+      title: "\u0417\u0438\u043C\u043D\u0438\u0439 \u0431\u0438\u043E\u043C"
+      description: "\u0422\u0435\u0441\u0442"
+      imageURI: "\u0438\u0430\u0432"
+      price: 15
+      priceValue: 15
+      priceCurrencyCode: 15
+      currencyImageURL: 15
       consumed: 1
   QuitGameEvent:
     enable: 0
