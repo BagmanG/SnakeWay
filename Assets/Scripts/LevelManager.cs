@@ -9,7 +9,7 @@ public class LevelManager : MonoBehaviour
     public GameObject BlueSnakePrefab;
     public GameObject RedSnakePrefab; // Добавлен префаб для красной змеи
     public CameraController Camera;
-
+    public LevelDesigner LevelDesigner;
     private GameObject _Player;
 
     public void LoadLevel()
@@ -22,6 +22,7 @@ public class LevelManager : MonoBehaviour
         BuildLevel();
         CreateEntities();
         InitCamera();
+        LevelDesigner.Init(CurrentLevel.name);
     }
 
     private void InitCamera()

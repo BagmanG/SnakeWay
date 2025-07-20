@@ -910,6 +910,7 @@ GameObject:
   - component: {fileID: 461841814}
   - component: {fileID: 461841813}
   - component: {fileID: 461841812}
+  - component: {fileID: 461841815}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -943,6 +944,7 @@ MonoBehaviour:
   BlueSnakePrefab: {fileID: 4670799170236667345, guid: e4b23bca3c00594449e2c7fe29f94774, type: 3}
   RedSnakePrefab: {fileID: 4670799170236667345, guid: 20b5c32b88afc9e4ba58e03b8d164c31, type: 3}
   Camera: {fileID: 963194229}
+  LevelDesigner: {fileID: 0}
 --- !u!114 &461841813
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -977,6 +979,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &461841815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 461841811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7602c4eb18439124e8d8de8c738b0fdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ForestColor: {r: 0.7137255, g: 0.854902, b: 0.19607842, a: 1}
+  WinterColor: {r: 1, g: 1, b: 1, a: 0}
+  Material: {fileID: 2100000, guid: 2c8ac31ddc42ac343a60fc4a9afb87e9, type: 2}
 --- !u!1 &531320708
 GameObject:
   m_ObjectHideFlags: 0
