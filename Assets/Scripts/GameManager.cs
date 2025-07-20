@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using YG;
 
 public class GameManager : MonoBehaviour
 {
@@ -24,7 +25,7 @@ public class GameManager : MonoBehaviour
         LevelManager.LoadLevel();
         playerController = FindObjectOfType<PlayerController>();
         snake = FindObjectOfType<Snake>();
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = 90;
         if (playerController != null)
         {
             moveCompleteAction = () => StartCoroutine(OnPlayerMoveComplete());
@@ -55,7 +56,9 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape)) { PauseGame(); return; }
-        if (Input.GetKeyDown(KeyCode.R)) { TryAgain(); return; }
+        #if UNITY_EDITOR
+            if (Input.GetKeyDown(KeyCode.R)) { TryAgain(); return; }
+        #endif
     }
 
     private IEnumerator OnPlayerMoveComplete()
@@ -174,6 +177,7 @@ public class GameManager : MonoBehaviour
 
     public void TryAgain()
     {
+        YG2.InterstitialAdvShow();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
@@ -217,6 +221,11 @@ public class GameManager : MonoBehaviour
             }
         }
         return number;
+    }
+
+    public void SkipLevel()
+    {
+
     }
 
     public bool IsLevelCompleted() => completed;
