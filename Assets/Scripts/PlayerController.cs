@@ -45,9 +45,7 @@ public class PlayerController : MonoBehaviour
                 CheckTileAfterMovement();
                 CheckSnakeCollision();
                 CheckStarCollision();
-                
 
-                // Проверяем, нужно ли продолжать скольжение
                 if (IsOnIce() && ShouldContinueSlide(currentMoveDirection))
                 {
                     StartCoroutine(ContinueSlide(currentMoveDirection));
@@ -62,11 +60,56 @@ public class PlayerController : MonoBehaviour
 
         if (!isPerformingAction && canMove)
         {
-            Vector3Int moveDirection = GetCameraRelativeGridDirection();
+            // Новый обработчик клавиатуры, использующий общий метод
+            Vector3Int moveDirection = Vector3Int.zero;
+
+            if (Input.GetKeyDown(KeyCode.W)) moveDirection = GetCameraRelativeDirection(Vector3Int.forward);
+            else if (Input.GetKeyDown(KeyCode.S)) moveDirection = GetCameraRelativeDirection(Vector3Int.back);
+            else if (Input.GetKeyDown(KeyCode.A)) moveDirection = GetCameraRelativeDirection(Vector3Int.left);
+            else if (Input.GetKeyDown(KeyCode.D)) moveDirection = GetCameraRelativeDirection(Vector3Int.right);
+
             if (moveDirection != Vector3Int.zero)
             {
                 StartPlayerAction(moveDirection);
             }
+        }
+    }
+
+    // Остальные методы (MoveUp, MoveDown и т.д.) остаются без изменений, как в предыдущем решении
+
+    public void MoveUp()
+    {
+        if (!isPerformingAction && canMove && !isMoving)
+        {
+            Vector3Int direction = GetCameraRelativeDirection(Vector3Int.forward);
+            StartPlayerAction(direction);
+        }
+    }
+
+    public void MoveDown()
+    {
+        if (!isPerformingAction && canMove && !isMoving)
+        {
+            Vector3Int direction = GetCameraRelativeDirection(Vector3Int.back);
+            StartPlayerAction(direction);
+        }
+    }
+
+    public void MoveLeft()
+    {
+        if (!isPerformingAction && canMove && !isMoving)
+        {
+            Vector3Int direction = GetCameraRelativeDirection(Vector3Int.left);
+            StartPlayerAction(direction);
+        }
+    }
+
+    public void MoveRight()
+    {
+        if (!isPerformingAction && canMove && !isMoving)
+        {
+            Vector3Int direction = GetCameraRelativeDirection(Vector3Int.right);
+            StartPlayerAction(direction);
         }
     }
 
@@ -232,7 +275,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    Vector3Int GetCameraRelativeGridDirection()
+    private Vector3Int GetCameraRelativeDirection(Vector3Int baseDirection)
     {
         Vector3 forward = cameraController.transform.forward;
         Vector3 right = cameraController.transform.right;
@@ -241,26 +284,21 @@ public class PlayerController : MonoBehaviour
         forward.Normalize();
         right.Normalize();
 
-        bool moveForward = Input.GetKeyDown(KeyCode.W);
-        bool moveBackward = Input.GetKeyDown(KeyCode.S);
-        bool moveLeft = Input.GetKeyDown(KeyCode.A);
-        bool moveRight = Input.GetKeyDown(KeyCode.D);
-
-        if (moveForward || moveBackward)
+        if (baseDirection == Vector3Int.forward || baseDirection == Vector3Int.back)
         {
             if (Mathf.Abs(forward.x) > Mathf.Abs(forward.z))
-                return new Vector3Int((int)Mathf.Sign(forward.x), 0, 0) * (moveForward ? 1 : -1);
+                return new Vector3Int((int)Mathf.Sign(forward.x), 0, 0) * (baseDirection.z > 0 ? 1 : -1);
             else
-                return new Vector3Int(0, 0, (int)Mathf.Sign(forward.z)) * (moveForward ? 1 : -1);
+                return new Vector3Int(0, 0, (int)Mathf.Sign(forward.z)) * (baseDirection.z > 0 ? 1 : -1);
         }
-        else if (moveLeft || moveRight)
+        else if (baseDirection == Vector3Int.left || baseDirection == Vector3Int.right)
         {
             if (Mathf.Abs(right.x) > Mathf.Abs(right.z))
-                return new Vector3Int((int)Mathf.Sign(right.x), 0, 0) * (moveRight ? 1 : -1);
+                return new Vector3Int((int)Mathf.Sign(right.x), 0, 0) * (baseDirection.x > 0 ? 1 : -1);
             else
-                return new Vector3Int(0, 0, (int)Mathf.Sign(right.z)) * (moveRight ? 1 : -1);
+                return new Vector3Int(0, 0, (int)Mathf.Sign(right.z)) * (baseDirection.x > 0 ? 1 : -1);
         }
 
-        return Vector3Int.zero;
+        return baseDirection;
     }
 }

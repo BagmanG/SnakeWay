@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public LevelManager LevelManager;
-    private PlayerController playerController;
+    public PlayerController playerController;
     private Snake snake;
     private bool isPlayerTurn = true;
     public GameUI UI;

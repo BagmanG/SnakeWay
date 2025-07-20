@@ -14,7 +14,8 @@ public class GameUI : MonoBehaviour
     [SerializeField] private Image[] gameOverStars;
     [SerializeField] private Sprite givedStar, unGivedStar;
 
-
+    [SerializeField] private GameObject MobileInputs;
+    [SerializeField] private MobileInputController MobileInputController;
     public bool PauseVisible { get { return PauseUI.activeSelf; } }
 
 
@@ -55,10 +56,10 @@ public class GameUI : MonoBehaviour
     private void InitForPlatform()
     {
         bool isDesktop = YG2.envir.isDesktop;
-        if (isDesktop)
+        if (!isDesktop)
         {
-
+            MobileInputs.SetActive(true);
+            MobileInputController.Initialize(GameManager.playerController);
         }
-        Debug.Log($"Desktop? {isDesktop}");
     }
 }
