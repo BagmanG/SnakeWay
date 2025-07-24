@@ -88,6 +88,7 @@ public class MainMenu : MonoBehaviour
         if (id == "WinterBiomePurchased")
         {
             YG2.SetState("WinterBiomePurchased",1);
+            UpdateData();
         }
     }
 
