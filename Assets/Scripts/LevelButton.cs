@@ -8,21 +8,30 @@ using YG;
 public class LevelButton : MonoBehaviour
 {
     [SerializeField] private Text Text;
-    [SerializeField] private GameObject[] Stars;
     [SerializeField] private GameObject Locked;
     private LevelData data;
     private int levelIndex;
     
     private bool needBuy;
-
+    [SerializeField] private GameObject stars3;
+    [SerializeField] private GameObject stars2;
+    [SerializeField] private GameObject stars1;
     public void Init(int index,int starsCount,LevelData data)
     {
         this.levelIndex = index;
         this.data = data;
         Text.text = $"{index}";
-        for(int i = 0; i < 3; i++)
+        if(starsCount == 1)
         {
-            Stars[i].SetActive(i<starsCount);    
+            stars1.SetActive(true);
+        }
+        if (starsCount == 2)
+        {
+            stars2.SetActive(true);
+        }
+        if (starsCount == 3)
+        {
+            stars3.SetActive(true);
         }
         CheckNeedBuy();
     }
