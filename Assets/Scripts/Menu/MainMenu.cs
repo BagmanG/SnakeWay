@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using YG;
 public class MainMenu : MonoBehaviour
 {
@@ -6,14 +7,39 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private Transform LevelsRoot;
     private Biome currentBiome = Biome.Forest;
 
-    public GameObject SelectBiomeObject,SelectLevelObject;
+    public GameObject SelectBiomeObject,SelectLevelObject,MainObject;
+    public GameObject ReviewButton;
     public GameLevels Levels;
-
+    public GameObject AuthPlayerInfo;
+    public GameObject AuthPlayerButton;
     private void Start()
     {
         ConsumePurchases();
+        MainObject.SetActive(true);
+        CheckReview();
+        CheckAuth();
     }
 
+    private void CheckReview()
+    {
+        ReviewButton.SetActive(YG2.reviewCanShow);
+    }
+
+    private void CheckAuth()
+    {
+        AuthPlayerInfo.SetActive(YG2.player.auth);
+        AuthPlayerButton.SetActive(!YG2.player.auth);
+    }
+
+    public void Auth()
+    {
+        YG2.OpenAuthDialog();
+    }
+
+    public void UpdateData()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
 
     private void ConsumePurchases()
     {
@@ -45,6 +71,7 @@ public class MainMenu : MonoBehaviour
 
     private void OnEnable()
     {
+        YG2.onGetSDKData += UpdateData;
         YG2.onPurchaseSuccess += SuccessPurchased;
         YG2.onPurchaseFailed += FailedPurchased;
     }
@@ -53,6 +80,7 @@ public class MainMenu : MonoBehaviour
     {
         YG2.onPurchaseSuccess -= SuccessPurchased;
         YG2.onPurchaseFailed -= FailedPurchased;
+        YG2.onGetSDKData -= UpdateData;
     }
 
     private void SuccessPurchased(string id)

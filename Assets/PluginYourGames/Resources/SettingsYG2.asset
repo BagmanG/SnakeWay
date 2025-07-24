@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Authorization:
     playerPhotoSize: 1
-    authorized: 1
+    authorized: 0
     playerName: Player current
     uniqueID: 000
     playerPhoto: demo image
