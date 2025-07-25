@@ -95,6 +95,25 @@ public class MainMenu : MonoBehaviour
         {
             YG2.SetState("WinterBiomePurchased",1);
             UpdateData();
+            return;
+        }
+        if (id == "Hat1")
+        {
+            YG2.SetState("Hat1", 1);
+            UpdateData();
+            return;
+        }
+        if (id == "Hat2")
+        {
+            YG2.SetState("Hat2", 1);
+            UpdateData();
+            return;
+        }
+        if (id == "Hat3")
+        {
+            YG2.SetState("Hat3", 1);
+            UpdateData();
+            return;
         }
     }
 

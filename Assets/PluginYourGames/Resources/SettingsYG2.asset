@@ -344,6 +344,33 @@ MonoBehaviour:
       priceCurrencyCode: 15
       currencyImageURL: 15
       consumed: 1
+    - id: Hat1
+      title: "\u0417\u0438\u043C\u043D\u0438\u0439 \u0431\u0438\u043E\u043C"
+      description: "\u0422\u0435\u0441\u0442"
+      imageURI: "\u0438\u0430\u0432"
+      price: 15
+      priceValue: 15
+      priceCurrencyCode: 15
+      currencyImageURL: 15
+      consumed: 0
+    - id: Hat2
+      title: "\u0417\u0438\u043C\u043D\u0438\u0439 \u0431\u0438\u043E\u043C"
+      description: "\u0422\u0435\u0441\u0442"
+      imageURI: "\u0438\u0430\u0432"
+      price: 15
+      priceValue: 15
+      priceCurrencyCode: 15
+      currencyImageURL: 15
+      consumed: 0
+    - id: Hat3
+      title: "\u0417\u0438\u043C\u043D\u0438\u0439 \u0431\u0438\u043E\u043C"
+      description: "\u0422\u0435\u0441\u0442"
+      imageURI: "\u0438\u0430\u0432"
+      price: 15
+      priceValue: 15
+      priceCurrencyCode: 15
+      currencyImageURL: 15
+      consumed: 0
   QuitGameEvent:
     enable: 0
     objectName: NameYourObject

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class WinterBiomeAds : MonoBehaviour
 {
-    private string id = "WinterBiomePurchased";
+    [SerializeField] private string id = "WinterBiomePurchased";
     [SerializeField] private Text title;
     [SerializeField] private Text price;
     private void Start() => UpdateEntries(YG2.PurchaseByID(id));

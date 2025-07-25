@@ -9,6 +9,7 @@ public class HatSetter : MonoBehaviour
     public void Start()
     {
         int skinId = YG2.GetState("SkinID");
+        Debug.Log($"Setted Skin {skinId}");
         if (skinId == 0)
         {
             SetHeadVisible(true);
@@ -16,6 +17,7 @@ public class HatSetter : MonoBehaviour
         }
         else
         {
+            SetHeadVisible(false);
             SetHat(skinId);
             return;
         }
@@ -23,9 +25,10 @@ public class HatSetter : MonoBehaviour
 
     public void SetHat(int id)
     {
-        for (int i = 0; i < head.Length; i++)
+        for (int i = 0; i < hats.Length; i++)
         {
-            head[i].SetActive(id == i);
+            hats[i].SetActive(id-1 == i);
+            Debug.Log(id - 1 == i);
         }
     }
 
