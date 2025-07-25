@@ -15,6 +15,7 @@ public class MainMenu : MonoBehaviour
     public GameObject AuthPlayerButton;
     public GameObject WinterBiomeAds;
     public GameObject WhyAuthObject;
+    public GameObject BuyWinterModal;
     private void Start()
     {
         ConsumePurchases();
@@ -105,5 +106,10 @@ public class MainMenu : MonoBehaviour
     public void BuyWinterBiome()
     {
         YG2.BuyPayments("WinterBiomePurchased");
+    }
+
+    public void SetBuyWinterModal(bool value)
+    {
+        BuyWinterModal.SetActive(value);
     }
 }

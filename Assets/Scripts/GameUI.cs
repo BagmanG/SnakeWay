@@ -49,8 +49,8 @@ public class GameUI : MonoBehaviour
     private void PreInitUI()
     {
         LoadGameOverStars();
-        gameOverText.text = $"Количетсво ходов: {GameManager.Steps + 1}\nУровень: {levelIndex}";
-        finishText.text = $"Количетсво ходов: {GameManager.Steps + 1}\nУровень: {levelIndex}";
+        gameOverText.text = $"Количетсво ходов: {GameManager.Steps + 1}\nУровень: {levelIndex+1}";
+        finishText.text = $"Количетсво ходов: {GameManager.Steps + 1}\nУровень: {levelIndex+1}";
     }
 
 

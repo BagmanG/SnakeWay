@@ -47,8 +47,7 @@ public class LevelButton : MonoBehaviour
         }
         else
         {
-            //TODO
-            YG2.BuyPayments("WinterBiomePurchased");
+            GameObject.FindFirstObjectByType<MainMenu>().SetBuyWinterModal(true);
         }
     }
 
