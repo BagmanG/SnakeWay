@@ -1,3 +1,4 @@
+using Assets.Scripts;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using YG;
@@ -12,12 +13,15 @@ public class MainMenu : MonoBehaviour
     public GameLevels Levels;
     public GameObject AuthPlayerInfo;
     public GameObject AuthPlayerButton;
+    public GameObject WinterBiomeAds;
+    public GameObject WhyAuthObject;
     private void Start()
     {
         ConsumePurchases();
         MainObject.SetActive(true);
         CheckReview();
         CheckAuth();
+        WinterBiomeAds.SetActive(!GlobalVars.WinterPurchased());
     }
 
     private void CheckReview()
@@ -29,6 +33,7 @@ public class MainMenu : MonoBehaviour
     {
         AuthPlayerInfo.SetActive(YG2.player.auth);
         AuthPlayerButton.SetActive(!YG2.player.auth);
+        WhyAuthObject.SetActive(!YG2.player.auth);
     }
 
     public void Auth()
