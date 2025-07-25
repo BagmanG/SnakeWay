@@ -547,6 +547,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   StarActive: {fileID: 5645061633171656637}
   StarPassive: {fileID: 7521109983629699619}
+  source: {fileID: 0}
+  giveStarClip: {fileID: 0}
 --- !u!1 &8198473959161556882
 GameObject:
   m_ObjectHideFlags: 0

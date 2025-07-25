@@ -2,6 +2,7 @@ using Assets.Scripts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using YG;
@@ -20,6 +21,12 @@ public class GameManager : MonoBehaviour
     public int Steps = 0;
     public int LevelIndex = 0;
     public GameLevels GameLevels;
+    public AudioSource source;
+    public AudioClip[] giveStarClips;
+    public AudioClip finishClip;
+    public AudioClip gameOverClip;
+    public CameraController cameraController;
+
     public void Start()
     {
         LevelManager.CurrentLevel = GlobalVars.currentBiome == Biome.Forest ? GameLevels.ForestLevels[GlobalVars.currentLevelID] : GameLevels.WinterLevels[GlobalVars.currentLevelID];
@@ -179,7 +186,11 @@ public class GameManager : MonoBehaviour
         if (!completed)
         {
             Debugger.Instance?.Log("=== GAME OVER ===");
+            source.PlayOneShot(gameOverClip);
             UI.ShowGameOver();
+            playerController.enabled = false;
+            completed = true;
+            cameraController.enabled = false;
         }
     }
 
@@ -191,6 +202,7 @@ public class GameManager : MonoBehaviour
 
     public void GivePlayerStar()
     {
+        source.PlayOneShot(giveStarClips[StarsCount]);
         StarsCount++;
         for (int i = 0; i < 3; i++)
         {
@@ -206,7 +218,11 @@ public class GameManager : MonoBehaviour
             Debugger.Instance?.Log("=== LEVEL COMPLETED ===");
             Debug.Log("LEVEL COMPLTETED");
             completed = true;
+            source.PlayOneShot(finishClip);
             UI.ShowFinish();
+            cameraController.enabled = false;
+            playerController.enabled = false;
+            
         }
     }
 
