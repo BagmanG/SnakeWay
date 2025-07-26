@@ -255,6 +255,12 @@ public class GameManager : MonoBehaviour
 
     public void GoNextLevel()
     {
+        if(GlobalVars.currentLevelID == 1 && GlobalVars.currentBiome == Biome.Winter && !GlobalVars.WinterPurchased())
+        {
+            SceneManager.LoadScene("MainMenu");
+            return;
+        }
+       
         ///TODO
         //Переход на след.биом
         if (GlobalVars.currentLevelID == 9 && GlobalVars.currentBiome == Biome.Forest)

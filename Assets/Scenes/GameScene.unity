@@ -11203,6 +11203,7 @@ GameObject:
   - component: {fileID: 1462083722}
   - component: {fileID: 1462083721}
   - component: {fileID: 1462083723}
+  - component: {fileID: 1462083724}
   m_Layer: 5
   m_Name: MusicOnOff
   m_TagString: Untagged
@@ -11311,7 +11312,34 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1462083721}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1462083724}
+        m_TargetAssemblyTypeName: SoundVisibility, Assembly-CSharp
+        m_MethodName: Clicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &1462083724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1462083719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 718410cb06dd8554ab4bde590dcd5971, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  img: {fileID: 1005798042}
+  onSprite: {fileID: 21300000, guid: b01ab41da6eaa4f45b3456a984269674, type: 3}
+  offSprite: {fileID: 21300000, guid: b913503c698147e45abc98ce0cf03d9b, type: 3}
 --- !u!1 &1473172269
 GameObject:
   m_ObjectHideFlags: 0
