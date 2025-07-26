@@ -1,5 +1,4 @@
 using UnityEngine;
-using YG.EditorScr;
 using YG.Utils.Pay;
 using YG;
 using UnityEngine.UI;
