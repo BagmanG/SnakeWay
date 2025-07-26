@@ -19,18 +19,18 @@ public class HatManager : MonoBehaviour
             hatsBuyButton[i].SetActive(YG2.GetState($"Hat{i+1}") == 0);
             hatsSetButton[i].SetActive(YG2.GetState($"Hat{i+1}") == 1);
             hatsSetButton[i].GetComponent<Image>().color = equipColor;
-            hatsSetButton[i].transform.GetChild(0).GetComponent<Text>().text = "Надеть";
+            hatsSetButton[i].transform.GetChild(0).GetComponent<Text>().text = Lang.Get("equip");
             firstHatSetButton.GetComponent<Image>().color = equipColor;
-            firstHatSetButton.transform.GetChild(0).GetComponent<Text>().text = "Надеть";
+            firstHatSetButton.transform.GetChild(0).GetComponent<Text>().text = Lang.Get("equip");
             if (YG2.GetState($"Hat{i + 1}") == 1 && skinId == i+1){
                 hatsSetButton[i].GetComponent<Image>().color = equipedColor;
-                hatsSetButton[i].transform.GetChild(0).GetComponent<Text>().text = "Надето";
+                hatsSetButton[i].transform.GetChild(0).GetComponent<Text>().text = Lang.Get("equiped");
             }
         }
         if(skinId == 0)
         {
             firstHatSetButton.GetComponent<Image>().color = equipedColor;
-            firstHatSetButton.transform.GetChild(0).GetComponent<Text>().text = "Надето";
+            firstHatSetButton.transform.GetChild(0).GetComponent<Text>().text = Lang.Get("equiped");
         }
     }
 

@@ -42,9 +42,6 @@ public class GameManager : MonoBehaviour
             playerController.OnMoveComplete += moveCompleteAction;
         }
 
-        Debugger.Instance?.Log("=== Level Started ===");
-        Debugger.Instance?.Log($"Player Spawn: {LevelManager.CurrentLevel.playerSpawn}");
-
         for (int y = 0; y < LevelManager.CurrentLevel.height; y++)
         {
             string row = "";
@@ -52,7 +49,6 @@ public class GameManager : MonoBehaviour
             {
                 row += LevelManager.CurrentLevel.grid[x, y] + " ";
             }
-            Debugger.Instance?.Log("Grid Row " + y + ": " + row);
         }
         LoadLevelIndex();
         UI.Init();
@@ -84,8 +80,6 @@ public class GameManager : MonoBehaviour
             Mathf.RoundToInt(playerController.transform.position.x),
             Mathf.RoundToInt(playerController.transform.position.z)
         );
-
-        Debugger.Instance?.Log($"Player moved to {playerPosition}");
 
         Snake[] snakes = FindObjectsOfType<Snake>();
         HashSet<Vector2Int> occupiedCells = new HashSet<Vector2Int>();
@@ -121,7 +115,7 @@ public class GameManager : MonoBehaviour
             plannedMoves[snake] = nextCell;
             plannedBodies[snake] = snake.GetPlannedBodyPositions();
 
-            Debugger.Instance?.Log($"Snake {snake.name} head at {snake.transform.GetChild(0).position}, planned move: {nextCell}");
+          
         }
 
         HashSet<Vector2Int> conflictCells = new HashSet<Vector2Int>();
@@ -150,7 +144,7 @@ public class GameManager : MonoBehaviour
 
             if (isSelfBlocking || (!conflictCells.Contains(plannedMove) && !occupiedCells.Contains(plannedMove)))
             {
-                Debugger.Instance?.Log($"Snake {snake.name} executes move to {plannedMove}");
+               
                 yield return StartCoroutine(snake.Step());
 
                 for (int i = 0; i < snake.transform.childCount; i++)
@@ -165,7 +159,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                Debugger.Instance?.Log($"Snake {snake.name} blocked (planned: {plannedMove})");
+               
             }
         }
 
@@ -185,7 +179,7 @@ public class GameManager : MonoBehaviour
     {
         if (!completed)
         {
-            Debugger.Instance?.Log("=== GAME OVER ===");
+          
             source.PlayOneShot(gameOverClip);
             UI.ShowGameOver();
             playerController.enabled = false;
@@ -215,8 +209,7 @@ public class GameManager : MonoBehaviour
         if (completed == false)
         {
             SaveLevelInfo();
-            Debugger.Instance?.Log("=== LEVEL COMPLETED ===");
-            Debug.Log("LEVEL COMPLTETED");
+          
             completed = true;
             source.PlayOneShot(finishClip);
             UI.ShowFinish();
