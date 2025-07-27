@@ -1107,7 +1107,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 100 Yean
+  m_Text: "79 \u0420\u0423\u0411"
 --- !u!222 &152710118
 CanvasRenderer:
   m_ObjectHideFlags: 0
