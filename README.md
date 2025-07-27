@@ -2,7 +2,7 @@
 
 ![SnakeWay Banner](Screenshots/Scr1.jpg)  
 
-Поиграть в игру вы можете [тут] https://yandex.ru/games/app/453534?lang=ru
+Поиграть в игру вы можете тут: https://yandex.ru/games/app/453534?lang=ru
 
 ## Описание игры
 
